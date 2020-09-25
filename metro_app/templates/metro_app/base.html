@@ -1,0 +1,80 @@
+{% load static %}
+{% load bootstrap4 %}
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+
+<head>
+	<link rel="shortcut icon" type="image/png" href="{% static 'metro_app/favicon.ico' %}"/>
+	<title>{% block title %}{% endblock %}</title>
+	{% block meta %}{% endblock %}
+</head>
+
+<body>
+
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<a class="navbar-brand" href="{% url 'simulation_manager' %}"><h1>Metropolis</h1></a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item">
+					<a class="nav-link" href="{% url 'simulation_manager' %}"><i class="fas fa-home"></i> Home</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{% url 'how_to' %}"><i class="fas fa-question-circle"></i> Help</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" target="_blank" href="https://github.com/LucasJavaudin/MetropolisWebInterface/issues"><i class="fas fa-briefcase-medical"></i> Report an Issue</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{% url 'contributors' %}"><i class="fas fa-users"></i> Contributors</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{% url 'events_view' %}"><i class="fas fa-calendar-alt"></i> Events</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{% url 'articles_view' %}"><i class="fas fa-newspaper"></i> Articles</a>
+				</li>
+				{% if user.is_authenticated %}
+				<li class="nav-item">
+					<a class="nav-link" href="{% url 'environments_view' %}"><i class="fas fa-boxes"></i> Environments</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+				</li>
+				{% else %}
+				<li class="nav-item">
+					<a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
+				</li>
+				{% endif %}
+			</ul>
+			<span class="navbar-text">
+				{% if user.is_authenticated %}
+				Welcome {{ request.user }}
+				{% elif user.is_superuser %}
+				<a href="">Welcome {{ request.user }}</a>
+				{% else %}
+				Please, <a href="{% url 'login' %}">login</a> or <a href="{% url 'register' %}">create an account</a>
+				{% endif %}
+			</span>
+		</div>
+	</nav>
+
+	<div class="m-3">
+	{% block main %}{% endblock %}
+	</div>
+
+</body>
+
+<script>
+{% block scripts %}{% endblock %}
+</script>

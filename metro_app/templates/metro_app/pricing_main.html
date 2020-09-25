@@ -1,0 +1,230 @@
+{% extends 'metro_app/base.html' %}
+{% load custom_template %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+{% block title %}
+{{ simulation.name }} - Metropolis
+{% endblock %}
+
+{% block main %}
+
+<div class="container">
+
+	<h3>Road Pricing</h3>
+	This page allows to define tolls on specific links.
+	Tolls apply either to all travelers or only to one specific traveler type.
+	Tolls are either constant during the whole day or vary through time.
+
+	<br>
+
+	To add tolls to the simulation, import a tsv file with the following columns:
+	<ul>
+		<li><i>link</i>: id of the link affected</li>
+		<li><i>values</i>: if toll is constant, value of the toll; else, values at each time interval separated by a comma</li>
+		<li><i>times</i> (optional): if toll is constant, leave empty; else time intervals for the tolls (in minutes, 0 is midnight)</li>
+		<li><i>traveler_type</i> (optional): id of the traveler type affected; set to 0 or nothing if the toll applies to everyone</li>
+	</ul>
+	<!--For time-varying tolls, the first value in <i>values</i> is the amount paid between the start of the recording period and the first value in <i>times</i>, the second value is the amound paid between the first value and the second value in <i>times</i>, etc.-->
+	<!--The last value in <i>values</i> is the amount paid between the last value in <i>times</i> and the end of the recording period.-->
+	There must be one more value in the <i>values</i> vector than in the <i>times</i> vector.
+	For example, if <i>link</i> is 2, <i>values</i> is <i>1,2,1</i>, <i>times</i> is <i>420,540</i> and <i>traveler_type</i> is 1, then the travelers of type 1 pay a toll when going through link 2.
+	The amount paid is 1 from 0:00 until 7:00 (420 minutes), 2 between 7:00 and 9:00 (540 minutes) and 1 from 9:00 until 23:59.
+
+	<br>
+
+	{% if count > 1 %}
+	There are {{ count|intcomma }} links with a toll.
+	{% else %}
+	There is {{ count }} link with a toll.
+	{% endif %}
+
+	<br>
+
+	<div class="row">
+
+		<div class="col text-center">
+
+			<div class="btn-group my-1" role="group">
+				{% if has_link and count %}
+				<a role="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" href="{% url 'pricing_view' simulation.id %}">
+					View tolls
+				</a>
+				{% elif has_link %}
+				<button type="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" title="There is no toll" disabled>
+					View tolls
+				</button>
+				{% else %}
+				<button type="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" title="The network has no link" disabled>
+					View tolls
+				</button>
+				{% endif %}
+				{% if owner %}
+				{% if has_link %}
+				<!--<a role="button" class="btn btn-outline-primary w-50" href="">-->
+					<!--Edit tolls-->
+				<!--</a>-->
+				<button type="button" class="btn btn-outline-primary w-50" title="Not yet implemented" disabled>
+					Edit tolls
+				</button>
+				{% else %}
+				<!--<button type="button" class="btn btn-outline-primary w-50" title="The network has no link" disabled>-->
+					<!--Edit tolls-->
+				<!--</button>-->
+				<button type="button" class="btn btn-outline-primary w-50" title="Not yet implemented" disabled>
+					Edit tolls
+				</button>
+				{% endif %}
+				{% endif %}
+			</div>
+			<br>
+			<div class="btn-group my-1" role="group">
+				{% if has_link and count %}
+				<a role="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" href="{% url 'pricing_export' simulation.id %}">
+					Export tolls
+				</a>
+				{% elif has_link %}
+				<button type="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" title="There is no toll" disabled>
+					Export tolls
+				</button>
+				{% else %}
+				<button type="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" title="The network has no link" disabled>
+					Export tolls
+				</button>
+				{% endif %}
+				{% if owner %}
+				{% if has_link %}
+				<button type="button" class="btn btn-outline-primary w-50" data-toggle="modal" data-target="#importModal">
+					Import tolls
+				</button>
+				{% else %}
+				<button type="button" class="btn btn-outline-primary w-50" title="The network has no link" disabled>
+					Import tolls
+				</button>
+				{% endif %}
+				{% endif %}
+			</div>
+
+			<br>
+
+			{% if owner %}
+			{% if count %}
+			<button type="button" class="btn btn-outline-danger my-3" data-toggle="modal" data-target="#deleteModal">
+				Reset tolls
+			</button>
+			{% else %}
+			<button type="button" class="btn btn-outline-danger my-3" title="There is no toll" disabled>
+				Reset tolls
+			</button>
+			{% endif %}
+			{% endif %}
+
+		</div>
+
+	</div>
+
+	<br>
+
+	<center>
+
+		<a role="button" class="btn btn-secondary mt-3" href="{% url 'simulation_view' simulation.id %}" title="Go back to the simulation view page">
+			<span class="far fa-caret-square-left"></span> Back
+		</a>
+		
+	</center>
+
+</div>
+
+{% if owner %}
+{% if count %}
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Reset tolls</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				Do you really want to reset the tolls?
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary mx-auto" data-dismiss="modal">Close</button>
+				<a role="button" class="btn btn-danger mx-auto" href="{% url 'pricing_reset' simulation.id %}">Reset</a>
+			</div>
+		</div>
+	</div>
+</div>
+{% endif %}
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Import tolls</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<form action="{% url 'pricing_import' simulation.id %}" method="post" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-body">
+					The import file must be a tsv file with two to four columns: <i>link</i>, <i>values</i>, <i>times</i> (optional) and <i>traveler_type</i> (optional).
+					{% render_field import_form.import_file class="form-control-file my-3" %}
+					<div id="importDiv" style="display:none;">
+						<div class="progress">
+							<div class="progress-bar progress-bar-striped" role="progressbar" style="width: 50%; margin-right: 100%;"></div>
+						</div>
+						<div class="text-warning">
+							Please be patient, this operation can take up to one hour if the file imported has a large number of rows.
+							<br>
+							The import process does not stop if you close this pop-up.
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary mx-auto" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary mx-auto" onclick="runProgressBar()">Import></button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+function runProgressBar() {
+	var progressBar = $('.progress-bar');
+	var percentVal = 0;
+	var right = true;
+
+	// Show the progress bar
+	$('#importDiv').css("display", "block")
+	// Run the progress bar
+	window.setInterval(function(){
+	    percentVal += 5;
+	    if (right == true) {
+		    progressBar.css("margin-right", 100-percentVal+ '%');
+	    } else {
+		    progressBar.css("margin-left", percentVal+ '%');
+	    }
+
+
+	    if (percentVal == 100 || percentVal == 50 && right)
+	    {
+		percentVal = 0;
+		if (right == true) {
+			progressBar.css("margin-left", percentVal+ '%');
+			progressBar.css("margin-right", 0+ '%');
+		} else {
+			progressBar.css("margin-left", 0+ '%');
+			progressBar.css("margin-right", 100+ '%');
+		}
+		right = !right;
+	    }
+
+	}, 100);
+}
+{% endblock %}

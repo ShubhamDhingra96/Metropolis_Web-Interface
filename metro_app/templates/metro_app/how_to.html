@@ -1,0 +1,76 @@
+{% extends 'metro_app/base.html' %}
+{% load bootstrap4 %}
+
+{% block title %}
+Metropolis
+{% endblock %}
+
+{% block main %}
+
+<div class="container">
+	<div class="alert alert-primary">
+		<h1>Metropolis Tutorial</h1>
+
+		The tutorial of the Metropolis web interface can be downloaded <a href="{% url 'tutorial' %}">here</a>.
+
+		<h1 class="mt-5">Importing networks from OpenStreetMap</h1>
+		<br>
+
+		We developed a tool to convert OpentStreetMap networks into Metropolis networks.
+		A guide to use the tool can be downloaded <a href="{% url 'osm_tutorial' %}">here</a>.
+		To obtain the tool files, please contact one of the Metropolis administrators.
+
+		<h1 class="mt-5">Frequently Asked Questions</h1>
+		<br>
+
+		<p>
+		<p class="font-weight-bold">My file was not imported correctly. What is wrong?</p>
+		Check that your file is a well-formatted tsv file (tab-separated-values file) or csv file (comma-separated-values file). The first line of the file must be a header containing the name of the columns. You can check the required column names when you click on the import button. If you still get an error, <a href="https://github.com/LucasJavaudin/MetropolisWebInterface/issues">open a new issue</a> with a description of your problem (attach the tsv or csv file to the issue).
+		</p>
+		<br>
+
+		<p>
+		<p class="font-weight-bold">I cannot run my simulation. What is wrong?</p>
+		You can only run the simulation if it has at least two zone, one intersection, one link and one traveler.
+		Additionally, you cannot run the simulation if modal choice is enable for one traveler type but you did not specify any public transit network.
+		</p>
+		<br>
+
+		<p>
+		<p class="font-weight-bold">An error occurs when the simulation is running.</p>
+		Here are the errors which occur the more frequently:
+		<dl>
+			<dt>MetroError:Cannot disaggregate demand. Check inequalities</dt>
+			<dd>This error occurs when some travelers have invalid parameters (negative value for beta, for delta, for alpha or for the mus; desired arrival time lower than the start of the recording period).</dd>
+			<dt>MetroError:Flow record exceeding maximum value</dt>
+			<dd>The number of travelers on a link, at a given point in time, is too large. You might have to reduce the total number of travelers of the simulation.</dd>
+		</dl>
+		</p>
+		<br>
+
+		<p>
+		<p class="font-weight-bold">I have a large network and the network view is very slow. What is wrong?</p>
+		This is because the network view takes a lot of ressources on your computer's GPU. Try enabling your discrete GPU on your browser.
+		</p>
+		<br>
+
+		<p>
+		<p class="font-weight-bold">Will you add feature X?</p>
+		We are not planning to add any new feature but you can send your suggestions <a href="https://github.com/LucasJavaudin/MetropolisWebInterface/issues">here</a>.
+		</p>
+		<br>
+
+		<p>
+		<p class="font-weight-bold">I found a bug / a typo.</p>
+		Go to <a href="https://github.com/LucasJavaudin/MetropolisWebInterface/issues">this page</a>. If the bug / typo has not been reported yet, open a new issue.
+		</p>
+		<br>
+
+		<p>
+		<p class="font-weight-bold">I read the FAQ but I did not find an answer to my question / problem.</p>
+		Go to <a href="https://github.com/LucasJavaudin/MetropolisWebInterface/issues">this page</a>. If the question / problem has not been posted yet, open a new issue (provide as much detail as you can).
+		</p>
+	</div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'metro_app/base.html' %}
+
+{% block title %}
+{{ simulation.name }} - Metropolis
+{% endblock %}
+
+{% block main %}
+
+<div class="container">
+	
+	<div class="alert alert-danger">
+		The import file could not be processed.
+		<br>
+		Please, make sure that the headers are correctly specified and that all rows are filled.
+		<br>
+		{% if object %}
+		The import file must have the following headers: 
+		{% if object == 'pricing' %}
+		link, toll.
+		{% elif object == 'matrix' %}
+		origin, destination, population.
+		{% elif object == 'public_transit' %}
+		origin, destination, travel time.
+		{% elif object == 'centroid' or object == 'crossing' %}
+		id, name, x, y.
+		{% elif object == 'function' %}
+		id, name, expression.
+		{% elif object == 'link' %}
+		id, name, origin, destination, function, lanes, length, speed, capacity.
+		{% endif %}
+		{% if usertype %}
+		name, comment, alphaTI_mean, alphaTI_std alphaTI_type, alphaTP_mean,
+		alphaTP_std, alphaTP_type, beta_mean, beta_std, beta_type, delta_mean,
+		delta_std, delta_type, departureMu_mean, departureMu_std,
+		departureMu_type, gamma_mean, gamma_std, gamma_type, modeMu_mean,
+		modeMu_std, modeMu_type, penaltyTP_mean, penaltyTP_std,
+		penaltyTP_type,  routeMu_mean, routeMu_std, routeMu_type, tstar_mean,
+		tstar_std, tstar_type, typeOfRouteChoice, typeOfDepartureMu,
+		typeOfRouteMu, typeOfModeMu, localATIS, modeChoice, modeShortRun,
+		commuteType
+		{% endif %}
+		{% endif %}
+	</div>
+
+	<br>
+
+	<center>
+		<a role="button" class="btn btn-primary" href="{% url 'simulation_view' simulation.id %}">
+			Back
+		</a>
+	</center>
+
+</div>
+
+{% endblock %}
