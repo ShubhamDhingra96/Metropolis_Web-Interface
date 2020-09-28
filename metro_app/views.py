@@ -2701,6 +2701,7 @@ def simulation_export(request, simulation):
     files_names.append(public_transit_export_save(simulation, dir))
     files_names.append(pricing_export_save(simulation, dir))
 
+
     demandsegments = get_query('demandsegment', simulation)
     for demandsegment in demandsegments:
         files_names.append(matrix_export_save(simulation, demandsegment, dir))
@@ -2733,6 +2734,56 @@ def simulation_export(request, simulation):
 
     return response
 
+
+@public_required
+def travelers_simulation_export(request, simulation):
+    """View to make a zip file of all simulation parameters."""
+
+    seed = np.random.randint(10000)
+    dir = '{0}/website_files/exports/{1}'.format(settings.BASE_DIR, seed)
+    os.makedirs(dir)
+
+    files_names = []
+
+    files_names.append(object_export_save(simulation, 'centroid', dir))
+    files_names.append(object_export_save(simulation, 'crossing', dir))
+    files_names.append(object_export_save(simulation, 'link', dir))
+    files_names.append(object_export_save(simulation, 'function', dir))
+    #files_names.append(public_transit_export_save(simulation, dir))
+    #files_names.append(pricing_export_save(simulation, dir))
+    #files_names.append(usertype_export(simulation, dir))
+
+    demandsegments = get_query('demandsegment', simulation)
+    for demandsegment in demandsegments:
+        files_names.append(matrix_export_save(simulation, demandsegment, dir))
+
+    # Need to add parameters file here
+
+    zipname = '{0}'.format(str(simulation))
+
+    s = BytesIO()
+
+    file = zipfile.ZipFile(s, 'w')
+
+    for f in files_names:
+        # Calculate path for file in zip
+        fdir, fname = os.path.split(f)
+        zip_path = os.path.join(zipname, fname)
+
+        # Add file, at correct path
+        file.write(f, zip_path)
+
+    file.close()
+
+    # Grab ZIP file from in-memory, make response with correct MIME-type
+    response = HttpResponse(s.getvalue())
+    response['content_type'] = 'application/x-zip-compressed'
+    # ..and correct content-disposition
+    response['Content-Disposition'] = 'attachment; filename={0}.zip'.format(str(simulation))
+
+    shutil.rmtree(dir, ignore_errors=True)
+
+    return response
 
 
 
