@@ -70,6 +70,7 @@ class CustomCheckboxInput(forms.CheckboxInput):
             return 'true'
 
 class BaseSimulationForm(forms.ModelForm):
+
     """Form to edit basic variables of a simulation (name, comment and public).
 
     The form is used to create new a simulation, to copy a simulation or to
@@ -77,6 +78,7 @@ class BaseSimulationForm(forms.ModelForm):
     """
 
     #environment = forms.ModelChoiceField(queryset=Environment.objects.none())
+    zipfile = forms.FileField()
 
     def __init__(self, user, *args, **kwargs):
         super(BaseSimulationForm, self).__init__(*args, **kwargs)
@@ -98,6 +100,36 @@ class BaseSimulationForm(forms.ModelForm):
     class Meta:
         model = Simulation
         fields = ['name', 'comment', 'environment', 'contact', 'public']
+
+
+# Code added by Shubham for making a new form which will help in importing the Simulation.
+class BaseSimulationFormImport(forms.ModelForm):
+
+    zipfile = forms.FileField()
+
+    def __init__(self, user, *args, **kwargs):
+        super(BaseSimulationForm, self).__init__(*args, **kwargs)
+        if user.is_authenticated:
+            auth_environments = Environment.objects.filter(users=user)
+        else:
+            auth_environments = Environment.objects.none()
+        self.fields['environment'] = forms.ModelChoiceField(
+            queryset=auth_environments, required=False)
+        # Field comment is not required.
+        self.fields['comment'].required = False
+
+        # Add tooltips.
+        for bound_field in self:
+            bound_field.field.widget.attrs['title'] = bound_field.help_text
+
+        #if self.fields.widget.att
+
+    class Meta:
+        model = Simulation
+        fields = ['name', 'comment', 'environment', 'contact', 'public']
+
+
+
 
 class ParametersSimulationForm(forms.ModelForm):
     """Form to edit the parameters of a simulation."""

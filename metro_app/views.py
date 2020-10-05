@@ -9,6 +9,7 @@ import re
 import os
 import shutil
 import csv
+from encodings.punycode import selective_find
 from io import BytesIO
 import zipfile
 from shutil import copyfile
@@ -1408,7 +1409,7 @@ def matrix_export_save(simulation, demandsegment, dir):
     matrix_couples = Matrix.objects.filter(matrices=matrix)
     # To avoid conflict if two users export a file at the same time, we
     # generate a random name for the export file.
-    filename = dir + '/matrix(' + demandsegment.usertype.name + ')(' + str(demandsegment.usertype.user_id) + ').tsv'
+    filename = dir + '/matrix(' + demandsegment.usertype.name + ').tsv'
 
     with codecs.open(filename, 'w', encoding='utf8') as f:
         writer = csv.writer(f, delimiter='\t')
@@ -1875,7 +1876,7 @@ def object_view(request, simulation, object_name):
         nb_crossings = get_query('crossing', simulation).count()
         nb_functions = get_query('function', simulation).count()
         network_empty = not (nb_centroids >= 2 and nb_crossings >= 1
-                             and nb_functions >= 1)
+                             and nb_functobject_viewions >= 1)
     import_form = ImportForm()
     context = {
         'simulation': simulation,
@@ -2689,7 +2690,7 @@ def simulation_export(request, simulation):
     """View to make a zip file of all simulation parameters."""
 
     seed = np.random.randint(10000)
-    dir = '{0}/website_files/exports/{1}'.format(settings.BASE_DIR, seed)
+    dir = '{0}/website_files/exports_traveler/{1}'.format(settings.BASE_DIR, seed)
     os.makedirs(dir)
 
     files_names = []
@@ -2705,6 +2706,7 @@ def simulation_export(request, simulation):
     demandsegments = get_query('demandsegment', simulation)
     for demandsegment in demandsegments:
         files_names.append(matrix_export_save(simulation, demandsegment, dir))
+
 
     # Need to add parameters file here
 
@@ -2736,26 +2738,27 @@ def simulation_export(request, simulation):
 
 
 @public_required
-def travelers_simulation_export(request, simulation):
+def traveler_simulation_export(request, simulation):
     """View to make a zip file of all simulation parameters."""
 
     seed = np.random.randint(10000)
-    dir = '{0}/website_files/exports/{1}'.format(settings.BASE_DIR, seed)
+    dir = '{0}/website_files/exports_traveler/{1}'.format(settings.BASE_DIR, seed)
     os.makedirs(dir)
 
     files_names = []
 
-    files_names.append(object_export_save(simulation, 'centroid', dir))
-    files_names.append(object_export_save(simulation, 'crossing', dir))
-    files_names.append(object_export_save(simulation, 'link', dir))
-    files_names.append(object_export_save(simulation, 'function', dir))
+    #files_names.append(object_export_save(simulation, 'centroid', dir))
+    #files_names.append(object_export_save(simulation, 'crossing', dir))
+    #files_names.append(object_export_save(simulation, 'link', dir))
+    #files_names.append(object_export_save(simulation, 'function', dir))
     #files_names.append(public_transit_export_save(simulation, dir))
     #files_names.append(pricing_export_save(simulation, dir))
-    #files_names.append(usertype_export(simulation, dir))
+
 
     demandsegments = get_query('demandsegment', simulation)
     for demandsegment in demandsegments:
         files_names.append(matrix_export_save(simulation, demandsegment, dir))
+        files_names.append(travel_usertype_save(simulation, demandsegment, dir))
 
     # Need to add parameters file here
 
@@ -2784,7 +2787,6 @@ def travelers_simulation_export(request, simulation):
     shutil.rmtree(dir, ignore_errors=True)
 
     return response
-
 
 
 @require_POST
@@ -2809,8 +2811,7 @@ def usertype_import(request, simulation):
         ))
 
 
-@public_required
-@check_demand_relation
+
 def usertype_export(request, simulation, demandsegment):
     usertype = demandsegment.usertype
 
@@ -2818,7 +2819,7 @@ def usertype_export(request, simulation, demandsegment):
     # To avoid conflict if two users export a file at the same time, we
     # generate a random name for the export file.
     seed = np.random.randint(10000)
-    filename = '{0}/website_files/exports/{1}.tsv'.format(settings.BASE_DIR,
+    filename ='{0}/website_files/exports/{1}.tsv'.format(settings.BASE_DIR,
                                                           seed)
     with codecs.open(filename, 'w', encoding='utf8') as f:
         writer = csv.writer(f, delimiter='\t')
@@ -3107,4 +3108,181 @@ def gen_formset(object_name, simulation, request=None):
                     simulation=simulation,
                 )
     return formset
+
+
+def travel_usertype_save(simulation, demandsegment, dir):
+    """View to send a file with the OD Matrix to the user."""
+    usertype = demandsegment.usertype
+    # To avoid conflict if two users export a file at the same time, we
+    # generate a random name for the export file.
+    filename = '{0}/usertype_{1}.tsv'.format(dir, demandsegment.id)
+
+
+    with codecs.open(filename, 'w', encoding='utf8') as f:
+        writer = csv.writer(f, delimiter='\t')
+
+        # Get a dictionary with all the values to export.
+
+        values = UserType.objects.filter(id=usertype.id).values_list('name', 'comment', 'alphaTI__mean', 'alphaTI__std',
+                                       'alphaTI__type', 'alphaTP__mean', 'alphaTP__std',
+                                       'alphaTP__type', 'beta__mean', 'beta__std',
+                                       'beta__type', 'delta__mean', 'delta__std',
+                                       'delta__type', 'departureMu__mean',
+                                       'departureMu__std', 'departureMu__type',
+                                       'gamma__mean', 'gamma__std', 'gamma__type',
+                                       'modeMu__mean', 'modeMu__std', 'modeMu__type',
+                                       'penaltyTP__mean', 'penaltyTP__std',
+                                       'penaltyTP__type', 'routeMu__mean', 'routeMu__std',
+                                       'routeMu__type', 'tstar__mean', 'tstar__std',
+                                       'tstar__type', 'typeOfRouteChoice',
+                                       'typeOfDepartureMu', 'typeOfRouteMu',
+                                       'typeOfModeMu', 'localATIS', 'modeChoice',
+                                       'modeShortRun', 'commuteType')
+
+    # Write a custom header.
+        writer.writerow(
+        ['name', 'comment', 'alphaTI_mean', 'alphaTI_std', 'alphaTI_type', 'alphaTP_mean', 'alphaTP_std',
+         'alphaTP_type', 'beta_mean', 'beta_std', 'beta_type', 'delta_mean', 'delta_std', 'delta_type',
+         'departureMu_mean', 'departureMu_std', 'departureMu_type', 'gamma_mean', 'gamma_std', 'gamma_type',
+         'modeMu_mean', 'modeMu_std', 'modeMu_type', 'penaltyTP_mean', 'penaltyTP_std', 'penaltyTP_type',
+         'routeMu_mean', 'routeMu_std', 'routeMu_type', 'tstar_mean', 'tstar_std', 'tstar_type',
+         'typeOfRouteChoice', 'typeOfDepartureMu', 'typeOfRouteMu', 'typeOfModeMu', 'localATIS', 'modeChoice',
+         'modeShortRun', 'commuteType'])
+
+        writer.writerows(values)
+    return filename
+
+@require_POST
+@login_required
+def simulation_import_action(request):
+    """This view is used when a user creates a new simulation.
+    The request should contain data for the new simulation (name, comment and
+    public).
+    """
+    # Create a form with the data send and check if it is valid.
+    form = BaseSimulationForm(request.user, request.POST, request.FILES)
+    if form.is_valid():
+        # Create a new simulation with the attributes sent.
+        simulation = Simulation()
+        simulation.user = request.user
+        simulation.name = form.cleaned_data['name']
+        simulation.comment = form.cleaned_data['comment']
+        simulation.public = form.cleaned_data['public']
+        simulation.environment = form.cleaned_data['environment']
+        simulation.contact = form.cleaned_data['contact']
+        # Create models associated with the new simulation.
+        network = Network()
+        network.name = simulation.name
+        network.save()
+        function_set = FunctionSet()
+        function_set.name = simulation.name
+        function_set.save()
+        # Add defaults functions.
+        function = Function(name='Free flow', user_id=1,
+                            expression='3600*(length/speed)')
+        function.save()
+        function.vdf_id = function.id
+        function.save()
+        function.functionset.add(function_set)
+        function = Function(name='Bottleneck function', user_id=2,
+                            expression=('3600*((dynVol<=(lanes*capacity*length'
+                                        + '/speed))*(length/speed)+(dynVol>'
+                                        + '(lanes*capacity*length/speed))*'
+                                        + '(dynVol/(capacity*lanes)))'))
+        function.save()
+        function.vdf_id = function.id
+        function.save()
+        function.functionset.add(function_set)
+        # Log density is not working somehow.
+        # function = Function(name='Log density', user_id=3,
+        # expression=('3600*(length/speed)'
+        # '*((dynVol<=8.0*lanes*length)'
+        # '+(dynVol>8.0*lanes*length)'
+        # '*((dynVol<0.9*130.0*lanes*length)'
+        # '*ln(130.0/8.0)'
+        # '/ln(130.0*lanes*length/(dynVol+0.01))'
+        # '+(dynVol>=0.9*130.0*lanes*length)'
+        # '*ln(130.0/8.0)/ln(1/0.9)))'))
+        # function.save()
+        # function.vdf_id = function.id
+        # function.save()
+        # function.functionset.add(function_set)
+        pttimes = Matrices()
+        pttimes.save()
+        supply = Supply()
+        supply.name = simulation.name
+        supply.network = network
+        supply.functionset = function_set
+        supply.pttimes = pttimes
+        supply.save()
+        demand = Demand()
+        demand.name = simulation.name
+        demand.save()
+        scenario = Scenario()
+        scenario.name = simulation.name
+        scenario.supply = supply
+        scenario.demand = demand
+        scenario.save()
+        # Save the simulation and return its view.
+        simulation.scenario = scenario
+        simulation.save()
+        return HttpResponseRedirect(
+            reverse('simulation_view', args=(simulation.id,))
+        )
+    else:
+        # I do not see how errors could happen.
+        return HttpResponseRedirect(reverse('simulation_manager'))
+
+@public_required
+def simulation_import_save(request, simulation):
+    """View to make a zip file of all simulation parameters."""
+
+    files_names = []
+
+    files_names.append(object_export_save(simulation, 'centroid', dir))
+    files_names.append(object_export_save(simulation, 'crossing', dir))
+    files_names.append(object_export_save(simulation, 'link', dir))
+    files_names.append(object_export_save(simulation, 'function', dir))
+    files_names.append(public_transit_export_save(simulation, dir))
+    files_names.append(pricing_export_save(simulation, dir))
+
+
+    demandsegments = get_query('demandsegment', simulation)
+    for demandsegment in demandsegments:
+        files_names.append(matrix_export_save(simulation, demandsegment, dir))
+
+
+    # Need to add parameters file here
+
+    zipname = '{0}'.format(str(simulation))
+
+    s = BytesIO()
+
+    file = ImportForm(s, 'w')
+
+    for f in files_names:
+        # Calculate path for file in zip
+        fdir, fname = os.path.split(f)
+        zip_path = os.path.join(zipname, fname)
+
+        # Add file, at correct path
+        file.write(f, zip_path)
+
+    file.close()
+
+    # Grab ZIP file from in-memory, make response with correct MIME-type
+    response = HttpResponse(s.getvalue())
+    response['content_type'] = 'application/x-zip-compressed'
+    # ..and correct content-disposition
+    response['Content-Disposition'] = 'attachment; filename={0}.zip'.format(str(simulation))
+
+    shutil.rmtree(dir, ignore_errors=True)
+
+    return response
+
+
+
+
+
+
 

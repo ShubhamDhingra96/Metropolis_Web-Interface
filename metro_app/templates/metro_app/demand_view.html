@@ -80,19 +80,16 @@ The simulation has no traveler type.
 </a>
 
 <br>
-<button type="button" class="btn btn-primary my-3" href="{% url 'simulation_export' simulation.id %}" data-toggle="modal" data-target="#importUsertypeModal" title="Import a new traveler type">
+<button type="button" class="btn btn-primary my-3" href="{% url 'simulation_import_save' simulation.id %}" data-toggle="modal" data-target="#importUsertypeModal" title="Import a new traveler type">
 	<i class="fas fa-plus-circle"></i> Import a traveler type
 </button>
 
      <!-- Code Added by Shubham on 15-09-2020 to add the Export function on Traveler's Page -->
- <a role="button" class="btn btn-primary my-3" href="{% url 'travelers_simulation_export' simulation.id %}" data-target="#exportUsertypeModal" title="Export a new traveler type">
+ <a role="button" class="btn btn-primary my-3" href="{% url 'traveler_simulation_export' simulation.id %}" data-target="#exportUsertypeModal" title="Export a new traveler type">
      <i class="fas fa-download"></i> Export traveler types</a>
 </a>
 
 <br>
-<a role="button" class="btn btn-primary my-3" href="{% url 'simulation_export' simulation.id %}" data-toggle="modal" data-target="#importUsertypeModal" title="Import a new traveler type">
-	<i class="fas fa-plus-circle"></i> Import traveler types (.zip file)
-</a>
 
 <br>
 

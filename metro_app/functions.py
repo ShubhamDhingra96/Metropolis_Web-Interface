@@ -737,7 +737,7 @@ def usertype_import_function(encoded_file, simulation):
         empty_vector.save()
     # Convert the imported file to a csv DictReader.
     tsv_file = StringIO(encoded_file.read().decode())
-    if encoded_file.name.split(".")[-1] == 'tsv':
+    if encoded_file.name.split(".")[-1] == 'zip':
         reader = csv.DictReader(tsv_file, delimiter='\t')
     else:
         reader = csv.DictReader(tsv_file, delimiter=',')
