@@ -9,7 +9,7 @@ import csv
 from io import StringIO
 import numpy as np
 import pandas as pd
-
+import zipfile
 from django.conf import settings
 from django.db.models import Sum
 from django.db import connection
@@ -737,10 +737,160 @@ def usertype_import_function(encoded_file, simulation):
         empty_vector.save()
     # Convert the imported file to a csv DictReader.
     tsv_file = StringIO(encoded_file.read().decode())
-    if encoded_file.name.split(".")[-1] == 'zip':
+    if encoded_file.name.split(".")[-1] == 'tsv':
         reader = csv.DictReader(tsv_file, delimiter='\t')
     else:
         reader = csv.DictReader(tsv_file, delimiter=',')
+
+    for row in reader:
+
+        name = row['name']
+        comment = row['comment']
+
+        alphaTI_mean = row['alphaTI_mean']
+        alphaTI_std = row['alphaTI_std']
+        alphaTI_type = row['alphaTI_type']
+        alphaTI = Distribution(mean=alphaTI_mean,
+                               std=alphaTI_std,
+                               type=alphaTI_type)
+        alphaTI.save()
+
+        alphaTP_mean = row['alphaTP_mean']
+        alphaTP_std = row['alphaTP_std']
+        alphaTP_type = row['alphaTP_type']
+        alphaTP = Distribution(mean=alphaTP_mean, std=alphaTP_std, type=alphaTP_type)
+        alphaTP.save()
+
+        beta_mean = row['beta_mean']
+        beta_std = row['beta_std']
+        beta_type = row['beta_type']
+        beta = Distribution(mean=beta_mean,
+                            std=beta_std,
+                            type=beta_type)
+        beta.save()
+
+        delta_mean = row['delta_mean']
+        delta_std = row['delta_std']
+        delta_type = row['delta_type']
+        delta = Distribution(mean=delta_mean,
+                             std=delta_std,
+                             type=delta_type)
+        delta.save()
+
+        departureMu_mean = row['departureMu_mean']
+        departureMu_std = row['departureMu_std']
+        departureMu_type = row['departureMu_type']
+        departureMu = Distribution(mean=departureMu_mean,
+                                   std=departureMu_std,
+                                   type=departureMu_type)
+        departureMu.save()
+
+        gamma_mean = row['gamma_mean']
+        gamma_std = row['gamma_std']
+        gamma_type = row['gamma_type']
+        gamma = Distribution(mean=gamma_mean,
+                             std=gamma_std,
+                             type=gamma_type)
+        gamma.save()
+
+        modeMu_mean = row['modeMu_mean']
+        modeMu_std = row['modeMu_std']
+        modeMu_type = row['modeMu_type']
+        modeMu = Distribution(mean=modeMu_mean,
+                              std=modeMu_std,
+                              type=modeMu_type)
+        modeMu.save()
+
+        penaltyTP_mean = row['penaltyTP_mean']
+        penaltyTP_std = row['penaltyTP_std']
+        penaltyTP_type = row['penaltyTP_type']
+        penaltyTP = Distribution(mean=penaltyTP_mean,
+                                 std=penaltyTP_std,
+                                 type=penaltyTP_type)
+        penaltyTP.save()
+
+        routeMu_mean = row['routeMu_mean']
+        routeMu_std = row['routeMu_std']
+        routeMu_type = row['routeMu_type']
+        routeMu = Distribution(mean=routeMu_mean,
+                               std=routeMu_std,
+                               type=routeMu_type)
+        routeMu.save()
+
+        tstar_mean = row['tstar_mean']
+        tstar_std = row['tstar_std']
+        tstar_type = row['tstar_type']
+        tstar = Distribution(mean=tstar_mean,
+                             std=tstar_std,
+                             type=tstar_type)
+        tstar.save()
+
+        typeOfRouteChoice = row['typeOfRouteChoice']
+        typeOfDepartureMu = row['typeOfDepartureMu']
+        typeOfRouteMu = row['typeOfRouteMu']
+        typeOfModeMu = row['typeOfModeMu']
+        localATIS = row['localATIS']
+        modeChoice = row['modeChoice']
+        modeShortRun = row['modeShortRun']
+        commuteType = row['commuteType']
+
+        usertypes = get_query('usertype', simulation)
+        if usertypes.exists():
+            user_id = usertypes.last().user_id + 1
+        else:
+            user_id = 1
+
+        # usertype = UserType(name=name, comment=comment, alphaTI=alphaTI, alphaTP=alphaTP, beta=beta, delta=delta, departureMu=departureMu, gamma=gamma, modeMu=modeMu, penaltyTP=penaltyTP, routeMu=routeMu, tstar=tstar, typeOfRouteChoice=typeOfRouteChoice, localATIS=localATIS, modeChoice=modeChoice, modeShortRun=modeShortRun, commuteType=commuteType, user_id=user_id)
+        usertype = UserType()
+        usertype.alphaTI = alphaTI
+        usertype.alphaTP = alphaTP
+        usertype.beta = beta
+        usertype.delta = delta
+        usertype.departureMu = departureMu
+        usertype.gamma = gamma
+        usertype.modeMu = modeMu
+        usertype.penaltyTP = penaltyTP
+        usertype.routeMu = routeMu
+        usertype.tstar = tstar
+        usertype.user_id = user_id
+        usertype.typeOfRouteChoice = typeOfRouteChoice
+        usertype.typeOfDepartureMu = typeOfDepartureMu
+        usertype.typeOfRouteMu = typeOfRouteMu
+        usertype.typeOfModeMu = typeOfModeMu
+        usertype.localATIS = localATIS
+        usertype.modeChoice = modeChoice
+        usertype.modeShortRun = modeShortRun
+        usertype.commuteType = commuteType
+        usertype.save()
+
+        matrix = Matrices()
+        matrix.save()
+        demandsegment = DemandSegment()
+        demandsegment.usertype = usertype
+        demandsegment.matrix = matrix
+        demandsegment.save()
+        demandsegment.demand.add(simulation.scenario.demand)
+
+
+def import_function_zip(encoded_file, simulation):
+    """Function to import a file as a new usertype in the database.
+       Parameters
+       ----------
+       encoded_file: File object.
+           Input file, as given by request.FILES.
+       simulation: Simulation object.
+           Simulation to modify.
+       """
+    # Get an empty Vector or create one if there is none.
+    if Vector.objects.filter(data='').exists():
+        empty_vector = Vector.objects.filter(data='')[0]
+    else:
+        empty_vector = Vector(data='')
+        empty_vector.save()
+    # Convert the imported file to a csv DictReader.
+    tsv_file = StringIO(encoded_file.read().decode())
+    if encoded_file.name.split(".")[-1] == 'zip':
+        reader = zipfile.ZipFile(tsv_file)
 
     for row in reader:
 

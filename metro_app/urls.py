@@ -161,21 +161,20 @@ urlpatterns = [
         views.object_view, name='object_view'),
     path(r'<simulation_id>/object/<object_name>/list/',
         views.object_list, name='object_list'),
-    path(r'<simulation_id>/demand/',
-        views.simulation_import_save, name='simulation_import_save'),
-    path(r'<simulation_id>/simulation_import/',
+    path(r'<simulation_id>/simulation_importfile/',
         views.simulation_import_save, name='simulation_import_save'),
     # For some reason object_edit_save must be declared before object_edit...
     path(r'<simulation_id>/object/<object_name>/edit/save',
         views.object_edit_save, name='object_edit_save'),
     path(r'<simulation_id>/object/<object_name>/edit/',
         views.object_edit, name='object_edit'),
-    path(r'<simulation_id>/object/<object_name>/delete/',
+    path(r'<simulation_id>/object/<obtraveler_import_actionject_name>/delete/',
         views.object_delete, name='object_delete'),
     path(r'<simulation_id>/object/<object_name>/import/',
         views.object_import, name='object_import'),
     path(r'<simulation_id>/object/<object_name>/export/',
         views.object_export, name='object_export'),
-    path(r'<simulation_id>/demand/import', views.usertype_import, name='usertype_import'),
-    path(r'<simulation_id>/demand/importzip', views.usertype_import, name = 'usertype_importzip')
+    path(r'<simulation_id>/demand/import/', views.usertype_import, name='usertype_import'),
+    path(r'<simulation_id>/demand/importzip/', views.traveler_zipimport, name='traveler_zipimport'),
+
 ]

@@ -103,12 +103,19 @@ class BaseSimulationForm(forms.ModelForm):
 
 
 # Code added by Shubham for making a new form which will help in importing the Simulation.
-class BaseSimulationFormImport(forms.ModelForm):
+class SimulationImportForm(forms.ModelForm):
 
-    zipfile = forms.FileField()
+    """Form to edit basic variables of a simulation (name, comment and public).
+
+    The form is used to create new a simulation, to copy a simulation or to
+    edit the variable of an existing simulation.
+    """
+
+    #environment = forms.ModelChoiceField(queryset=Environment.objects.none())
+    zipfile = forms.FileField
 
     def __init__(self, user, *args, **kwargs):
-        super(BaseSimulationForm, self).__init__(*args, **kwargs)
+        super(SimulationImportForm, self).__init__(*args, **kwargs)
         if user.is_authenticated:
             auth_environments = Environment.objects.filter(users=user)
         else:

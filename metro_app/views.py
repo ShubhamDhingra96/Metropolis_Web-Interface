@@ -4,6 +4,7 @@ Author: Lucas Javaudin
 E-mail: lucas.javaudin@ens-paris-saclay.fr
 """
 import time
+import pdb;
 import urllib
 import re
 import os
@@ -21,6 +22,7 @@ import numpy as np
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from django.http import Http404
+from django.template.context_processors import request
 from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView
 from django.views.decorators.http import require_POST
@@ -39,6 +41,7 @@ from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
 
 import metro_app
+
 
 from metro_app.models import *
 from metro_app.forms import *
@@ -253,7 +256,6 @@ def simulation_manager(request):
         'copy_form': copy_form,
     }
     return render(request, 'metro_app/simulation_manager.html', context)
-
 
 def register(request):
     """View to show the register form."""
@@ -2811,6 +2813,30 @@ def usertype_import(request, simulation):
         ))
 
 
+@require_POST
+@owner_required
+def traveler_zipimport(request, simulation):
+    """View to convert the imported file to usertype in the database."""
+    try:
+        encoded_file = request.cleaned_data['zipfile']
+        import_function_zip(encoded_file, simulation)
+    except Exception as e:
+        # Catch any exception while importing the file and return an error page
+        # if there is any.
+        print(e)
+        context = {
+            'simulation': simulation,
+            'object': 'pricing',
+        }
+        return render(request, 'metro_app/import_error.html', context)
+    else:
+        return HttpResponseRedirect(reverse(
+            'demand_view', args=(simulation.id,)
+        ))
+
+
+
+
 
 def usertype_export(request, simulation, demandsegment):
     usertype = demandsegment.usertype
@@ -3152,6 +3178,7 @@ def travel_usertype_save(simulation, demandsegment, dir):
         writer.writerows(values)
     return filename
 
+
 @require_POST
 @login_required
 def simulation_import_action(request):
@@ -3160,6 +3187,7 @@ def simulation_import_action(request):
     public).
     """
     # Create a form with the data send and check if it is valid.
+
     form = BaseSimulationForm(request.user, request.POST, request.FILES)
     if form.is_valid():
         # Create a new simulation with the attributes sent.
@@ -3226,12 +3254,133 @@ def simulation_import_action(request):
         # Save the simulation and return its view.
         simulation.scenario = scenario
         simulation.save()
+
+        encoded_file = form.cleaned_data['zipfile']
+        #pdb.set_trace()
+        file = zipfile.ZipFile(encoded_file)
+        name = file.namelist()
+        for n in name:
+            if n.endswith("zones.tsv") or n.endswith("zones.csv"):
+                object_import_function(file.open(n), simulation, 'centroid')
+
+        for c in name:
+            if c.endswith("intersections.tsv") or c.endswith("intersections.csv"):
+                object_import_function(file.open(c), simulation, 'crossing')
+
+        for l in name:
+            if l.endswith("links.tsv") or l.endswith("links.csv"):
+                object_import_function(file.open(l), simulation, 'link')
+
+        for f in name:
+            if f.endswith("congestion functions.tsv") or f.endswith("congestion functions.csv"):
+                object_import_function(file.open(f), simulation, 'function')
+        for public in name:
+            if public.endswith("public_transit.tsv") or public.endswith("public_transit.csv"):
+                public_transit_import_function(file.open(public), simulation)
+        for price in name:
+                if price.endswith("pricings.tsv") or  price.endswith("pricings.csv"):
+                    pricing_import_function(file.open(price), simulation)
+
+        for matrix in name:
+                if matrix.endswith("usertype_1.tsv") or matrix.endswith("usertype_1.csv"):
+                    usertype_import_function(file.open(matrix), simulation)
+
         return HttpResponseRedirect(
             reverse('simulation_view', args=(simulation.id,))
         )
     else:
-        # I do not see how errors could happen.
         return HttpResponseRedirect(reverse('simulation_manager'))
+
+
+@require_POST
+@owner_required
+def traveler_import_action(request):
+    """This view is used when a user creates a new simulation.
+    The request should contain data for the new simulation (name, comment and
+    public).
+    """
+    # Create a form with the data send and check if it is valid.
+
+    form = BaseSimulationForm(request.user, request.POST, request.FILES)
+    if form.is_valid():
+        # Create a new simulation with the attributes sent.
+        simulation = Simulation()
+        simulation.user = request.user
+        simulation.name = form.cleaned_data['name']
+        simulation.comment = form.cleaned_data['comment']
+        simulation.public = form.cleaned_data['public']
+        simulation.environment = form.cleaned_data['environment']
+        simulation.contact = form.cleaned_data['contact']
+        # Create models associated with the new simulation.
+        network = Network()
+        network.name = simulation.name
+        network.save()
+        function_set = FunctionSet()
+        function_set.name = simulation.name
+        function_set.save()
+        # Add defaults functions.
+        function = Function(name='Free flow', user_id=1,
+                            expression='3600*(length/speed)')
+        function.save()
+        function.vdf_id = function.id
+        function.save()
+        function.functionset.add(function_set)
+        function = Function(name='Bottleneck function', user_id=2,
+                            expression=('3600*((dynVol<=(lanes*capacity*length'
+                                        + '/speed))*(length/speed)+(dynVol>'
+                                        + '(lanes*capacity*length/speed))*'
+                                        + '(dynVol/(capacity*lanes)))'))
+        function.save()
+        function.vdf_id = function.id
+        function.save()
+        function.functionset.add(function_set)
+        # Log density is not working somehow.
+        # function = Function(name='Log density', user_id=3,
+        # expression=('3600*(length/speed)'
+        # '*((dynVol<=8.0*lanes*length)'
+        # '+(dynVol>8.0*lanes*length)'
+        # '*((dynVol<0.9*130.0*lanes*length)'
+        # '*ln(130.0/8.0)'
+        # '/ln(130.0*lanes*length/(dynVol+0.01))'
+        # '+(dynVol>=0.9*130.0*lanes*length)'
+        # '*ln(130.0/8.0)/ln(1/0.9)))'))
+        # function.save()
+        # function.vdf_id = function.id
+        # function.save()
+        # function.functionset.add(function_set)
+        pttimes = Matrices()
+        pttimes.save()
+        supply = Supply()
+        supply.name = simulation.name
+        supply.network = network
+        supply.functionset = function_set
+        supply.pttimes = pttimes
+        supply.save()
+        demand = Demand()
+        demand.name = simulation.name
+        demand.save()
+        scenario = Scenario()
+        scenario.name = simulation.name
+        scenario.supply = supply
+        scenario.demand = demand
+        scenario.save()
+        # Save the simulation and return its view.
+        simulation.scenario = scenario
+        simulation.save()
+        # Create a new simulation with the attributes sent.
+        # Create mosimulation_import_actiondels associated with the new simulation.
+
+        return HttpResponseRedirect(reverse(
+            'demand_view', args=(simulation.id,)
+        ))
+    else:
+        # I do not see how errors could happen.
+        return HttpResponseRedirect(reverse('demand_view'))
+
+
+
+
+
 
 @public_required
 def simulation_import_save(request, simulation):
@@ -3250,6 +3399,7 @@ def simulation_import_save(request, simulation):
     demandsegments = get_query('demandsegment', simulation)
     for demandsegment in demandsegments:
         files_names.append(matrix_export_save(simulation, demandsegment, dir))
+        files_names.append(travel_usertype_save(simulation, demandsegment, dir))
 
 
     # Need to add parameters file here
@@ -3279,10 +3429,3 @@ def simulation_import_save(request, simulation):
     shutil.rmtree(dir, ignore_errors=True)
 
     return response
-
-
-
-
-
-
-

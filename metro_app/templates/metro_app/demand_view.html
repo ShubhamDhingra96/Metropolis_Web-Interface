@@ -1,6 +1,7 @@
 {% extends 'metro_app/base.html' %}
 {% load humanize %}
 {% load widget_tweaks %}
+{% load bootstrap4 %}
 
 {% block title %}
 {{ simulation.name }} - Metropolis
@@ -80,9 +81,11 @@ The simulation has no traveler type.
 </a>
 
 <br>
-<button type="button" class="btn btn-primary my-3" href="{% url 'simulation_import_save' simulation.id %}" data-toggle="modal" data-target="#importUsertypeModal" title="Import a new traveler type">
-	<i class="fas fa-plus-circle"></i> Import a traveler type
+<button type="button" class="btn btn-primary my-3" data-toggle="modal" data-target="#importUsertypeModal" title="Import a new traveler type">
+	<i class="fas fa-plus-circle"></i> Import a traveler type (.csv or .tsv file)
 </button>
+
+    <br>
 
      <!-- Code Added by Shubham on 15-09-2020 to add the Export function on Traveler's Page -->
  <a role="button" class="btn btn-primary my-3" href="{% url 'traveler_simulation_export' simulation.id %}" data-target="#exportUsertypeModal" title="Export a new traveler type">
@@ -90,6 +93,10 @@ The simulation has no traveler type.
 </a>
 
 <br>
+
+    <button type="button" class="btn btn-primary my-3" data-toggle="modal" data-target="#newImportSimulation" title="Import a new traveler type">
+	<i class="fas fa-plus-circle"></i> Import a traveler type (.zip file)
+</button>
 
 <br>
 
@@ -136,7 +143,7 @@ The simulation has no traveler type.
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action method="post" enctype="multipart/form-data">
+			<form action="{% url 'usertype_import' simulation.id%}" method="post" enctype="multipart/form-data">
 				{% csrf_token %}
 				<div class="modal-body form-group">
 					The import file must be a tsv file with 40 columns:  <i>
@@ -167,4 +174,28 @@ The simulation has no traveler type.
 	</div>
 </div>
 
+
+    <div class="modal fade" id="newImportSimulation" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Import a New Traveler Type</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<form action="{% url 'traveler_zipimport' simulation.id %}" method="post" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-body form-group">
+					{% render_field import_form.import_file class="form-control-file my-3" %}
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary mx-auto" data-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary mx-auto">Import</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
 {% endblock %}

@@ -77,7 +77,7 @@
 					<i class="fas fa-road"></i> Network View
 				</a>
 				{% elif complete_network %}
-				<a role="button" class="btn btn-outline-primary btn-lg my-3" data-toggle="modal" data-target="#loadingNetwork" onclick="runNetworkProgressBar()" href="{% url 'metro:network_view' simulation.id %}" title="View a graph of the network">
+				<a role="button" class="btn btn-outline-primary btn-lg my-3" data-toggle="modal" data-target="#loadingNetwork" onclick="runNetworkProgressBar()" href="{% url 'network_view' simulation.id %}" title="View a graph of the network">
 					<i class="fas fa-road"></i> Network View
 				</a>
 				{% else %}
