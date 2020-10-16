@@ -1,8 +1,8 @@
 Collecting django-filter
-  Using cached django_filter-2.3.0-py3-none-any.whl (73 kB)
-Requirement already satisfied: Django>=2.2 in c:\users\nehad\pycharmprojects\metropoliswebinterface\virtualenv\lib\site-packages (from django-filter) (3.1.1)
-Requirement already satisfied: sqlparse>=0.2.2 in c:\users\nehad\pycharmprojects\metropoliswebinterface\virtualenv\lib\site-packages (from Django>=2.2->django-filter) (0.3.1)
-Requirement already satisfied: pytz in c:\users\nehad\pycharmprojects\metropoliswebinterface\virtualenv\lib\site-packages (from Django>=2.2->django-filter) (2020.1)
-Requirement already satisfied: asgiref~=3.2.10 in c:\users\nehad\pycharmprojects\metropoliswebinterface\virtualenv\lib\site-packages (from Django>=2.2->django-filter) (3.2.10)
+  Downloading django_filter-2.4.0-py3-none-any.whl (73 kB)
+Requirement already satisfied: Django>=2.2 in c:\users\nehad\pycharmprojects\metro\v\lib\site-packages (from django-filter) (3.1.2)
+Requirement already satisfied: pytz in c:\users\nehad\pycharmprojects\metro\v\lib\site-packages (from Django>=2.2->django-filter) (2020.1)
+Requirement already satisfied: asgiref~=3.2.10 in c:\users\nehad\pycharmprojects\metro\v\lib\site-packages (from Django>=2.2->django-filter) (3.2.10)
+Requirement already satisfied: sqlparse>=0.2.2 in c:\users\nehad\pycharmprojects\metro\v\lib\site-packages (from Django>=2.2->django-filter) (0.4.1)
 Installing collected packages: django-filter
-Successfully installed django-filter-2.3.0
+Successfully installed django-filter-2.4.0

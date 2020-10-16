@@ -14,7 +14,7 @@
 {% block main %}
 
 <center>
-	<a role="button" class="btn btn-secondary my-3" href="{% url 'simulation_view' simulation.id %}" title="Go back to the simulation view page">
+	<a role="button" class="btn btn-secondary my-3" href="{% url 'metro:simulation_view' simulation.id %}" title="Go back to the simulation view page">
 		<span class="far fa-caret-square-left"></span> Back
 	</a>
 </center>
@@ -25,7 +25,7 @@
 The server is currently preparing the simulation for the run.
 {% elif run.status == 'Running' %}
 This run is in progress.
-<a role="button" class="btn btn-outline-danger" href="{% url 'simulation_run_stop' simulation.id run.id %}">Cancel run</a>
+<a role="button" class="btn btn-outline-danger" href="{% url 'metro:simulation_run_stop' simulation.id run.id %}">Cancel run</a>
 {% elif run.status == 'Ending' %}
 This run has ended, the server is preparing the results.
 {% elif run.status == 'Over' %}
@@ -38,19 +38,19 @@ The run was canceled.
 
 {% if run.network_output %}
 <br>
-<a role="button" class="btn btn-outline-primary" href="{% url 'network_view_run' simulation.id run.id %}">Results on network</a>
+<a role="button" class="btn btn-outline-primary" href="{% url 'metro:network_view_run' simulation.id run.id %}">Results on network</a>
 {% endif %}
 {% if run.link_output %}
 <br>
-<a role="button" class="btn btn-outline-primary" href="{% url 'simulation_run_link_output' simulation.id run.id %}">Download link-specific results</a>
+<a role="button" class="btn btn-outline-primary" href="{% url 'metro:simulation_run_link_output' simulation.id run.id %}">Download link-specific results</a>
 {% endif %}
 {% if run.user_output %}
 <br>
-<a role="button" class="btn btn-outline-primary" href="{% url 'simulation_run_user_output' simulation.id run.id %}">Download traveler-specific results</a>
+<a role="button" class="btn btn-outline-primary" href="{% url 'metro:simulation_run_user_output' simulation.id run.id %}">Download traveler-specific results</a>
 {% endif %}
 {% if run.user_path %}
 <br>
-<a role="button" class="btn btn-outline-primary" href="{% url 'simulation_run_user_path' simulation.id run.id %}">Download traveler paths</a>
+<a role="button" class="btn btn-outline-primary" href="{% url 'metro:simulation_run_user_path' simulation.id run.id %}">Download traveler paths</a>
 {% endif %}
 
 {% if results %}

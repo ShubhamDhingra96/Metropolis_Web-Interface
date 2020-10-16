@@ -19,7 +19,7 @@
 <body>
 
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-		<a class="navbar-brand" href="{% url 'simulation_manager' %}"><h1>Metropolis</h1></a>
+		<a class="navbar-brand" href="{% url 'metro:simulation_manager' %}"><h1>Metropolis</h1></a>
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
@@ -27,33 +27,33 @@
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
 			<ul class="navbar-nav mr-auto">
 				<li class="nav-item">
-					<a class="nav-link" href="{% url 'simulation_manager' %}"><i class="fas fa-home"></i> Home</a>
+					<a class="nav-link" href="{% url 'metro:simulation_manager' %}"><i class="fas fa-home"></i> Home</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="{% url 'how_to' %}"><i class="fas fa-question-circle"></i> Help</a>
+					<a class="nav-link" href="{% url 'metro:how_to' %}"><i class="fas fa-question-circle"></i> Help</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" target="_blank" href="https://github.com/LucasJavaudin/MetropolisWebInterface/issues"><i class="fas fa-briefcase-medical"></i> Report an Issue</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="{% url 'contributors' %}"><i class="fas fa-users"></i> Contributors</a>
+					<a class="nav-link" href="{% url 'metro:contributors' %}"><i class="fas fa-users"></i> Contributors</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="{% url 'events_view' %}"><i class="fas fa-calendar-alt"></i> Events</a>
+					<a class="nav-link" href="{% url 'metro:events_view' %}"><i class="fas fa-calendar-alt"></i> Events</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="{% url 'articles_view' %}"><i class="fas fa-newspaper"></i> Articles</a>
+					<a class="nav-link" href="{% url 'metro:articles_view' %}"><i class="fas fa-newspaper"></i> Articles</a>
 				</li>
 				{% if user.is_authenticated %}
 				<li class="nav-item">
-					<a class="nav-link" href="{% url 'environments_view' %}"><i class="fas fa-boxes"></i> Environments</a>
+					<a class="nav-link" href="{% url 'metro:environments_view' %}"><i class="fas fa-boxes"></i> Environments</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+					<a class="nav-link" href="{% url 'metro:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
 				</li>
 				{% else %}
 				<li class="nav-item">
-					<a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
+					<a class="nav-link" href="{% url 'metro:login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
 				</li>
 				{% endif %}
 			</ul>
@@ -63,7 +63,7 @@
 				{% elif user.is_superuser %}
 				<a href="">Welcome {{ request.user }}</a>
 				{% else %}
-				Please, <a href="{% url 'login' %}">login</a> or <a href="{% url 'register' %}">create an account</a>
+				Please, <a href="{% url 'metro:login' %}">login</a> or <a href="{% url 'metro:register' %}">create an account</a>
 				{% endif %}
 			</span>
 		</div>

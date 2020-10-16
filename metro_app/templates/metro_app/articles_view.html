@@ -23,7 +23,7 @@ Metropolis
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="{% url 'articles_add' %}" method="post" enctype="multipart/form-data">
+			<form action="{% url 'metro:articles_add' %}" method="post" enctype="multipart/form-data">
 				<div class="modal-body">
 					{% csrf_token %}
 					{% bootstrap_form form show_label=True %}
@@ -47,7 +47,7 @@ Metropolis
 			<h3 class="display-5">{{ article.0.title }}
 				{% if user.username == article.0.creator or user.is_superuser%}
 				<span class="btn-group">
-					<form action="{% url 'articles_delete' article.0.id%}" method="post">
+					<form action="{% url 'metro:articles_delete' article.0.id%}" method="post">
 						{% csrf_token %}
 						<button class="btn btn-outline-danger" type="submit">Delete</button>
 					</form>

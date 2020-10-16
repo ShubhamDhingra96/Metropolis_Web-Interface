@@ -47,7 +47,7 @@
 
 			<div class="btn-group my-1" role="group">
 				{% if has_link and count %}
-				<a role="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" href="{% url 'pricing_view' simulation.id %}">
+				<a role="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" href="{% url 'metro:pricing_view' simulation.id %}">
 					View tolls
 				</a>
 				{% elif has_link %}
@@ -80,7 +80,7 @@
 			<br>
 			<div class="btn-group my-1" role="group">
 				{% if has_link and count %}
-				<a role="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" href="{% url 'pricing_export' simulation.id %}">
+				<a role="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" href="{% url 'metro:pricing_export' simulation.id %}">
 					Export tolls
 				</a>
 				{% elif has_link %}
@@ -127,7 +127,7 @@
 
 	<center>
 
-		<a role="button" class="btn btn-secondary mt-3" href="{% url 'simulation_view' simulation.id %}" title="Go back to the simulation view page">
+		<a role="button" class="btn btn-secondary mt-3" href="{% url 'metro:simulation_view' simulation.id %}" title="Go back to the simulation view page">
 			<span class="far fa-caret-square-left"></span> Back
 		</a>
 		
@@ -151,7 +151,7 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary mx-auto" data-dismiss="modal">Close</button>
-				<a role="button" class="btn btn-danger mx-auto" href="{% url 'pricing_reset' simulation.id %}">Reset</a>
+				<a role="button" class="btn btn-danger mx-auto" href="{% url 'metro:pricing_reset' simulation.id %}">Reset</a>
 			</div>
 		</div>
 	</div>
@@ -166,7 +166,7 @@
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="{% url 'pricing_import' simulation.id %}" method="post" enctype="multipart/form-data">
+			<form action="{% url 'metro:pricing_import' simulation.id %}" method="post" enctype="multipart/form-data">
 				{% csrf_token %}
 				<div class="modal-body">
 					The import file must be a tsv file with two to four columns: <i>link</i>, <i>values</i>, <i>times</i> (optional) and <i>traveler_type</i> (optional).
@@ -184,7 +184,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary mx-auto" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary mx-auto" onclick="runProgressBar()">Import></button>
+					<button type="submit" class="btn btn-primary mx-auto" onclick="runProgressBar()">Import</a>
 				</div>
 			</form>
 		</div>

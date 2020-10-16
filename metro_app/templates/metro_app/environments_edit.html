@@ -21,7 +21,7 @@ Metropolis
 		<div class="modal-header">
 			<h5 class="modal-title" id="modalEditTitle">Add a user</h5>
 		</div>
-		form action="{% url 'environments_add' environment.id %}"
+		<form action="{% url 'metro:environments_add' environment.id %}"
 			  method="post">
 			<div class="modal-body">
 				{% csrf_token %}

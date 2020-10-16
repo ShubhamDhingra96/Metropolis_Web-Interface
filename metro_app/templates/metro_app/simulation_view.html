@@ -23,7 +23,7 @@
 				<button type="button" class="btn btn-outline-primary mx-3" data-toggle="modal" data-target="#copyModal" onclick="updateCopyInput('{{ simulation.name }}', {{ simulation.id }});">
 					<i class="far fa-clone"></i> Copy
 				</button>
-				<a role="button" class="btn btn-outline-primary" href="{% url 'simulation_export' simulation.id %}"><i class="fas fa-download"></i>Export</a>
+				<a role="button" class="btn btn-outline-primary" href="{% url 'metro:simulation_export' simulation.id %}"><i class="fas fa-download"></i>Export</a>
 				{% endif %}
 				{% if owner %}
 				<button type="button" class="btn btn-outline-primary mx-3" data-toggle="modal" data-target="#editModal">
@@ -73,11 +73,11 @@
 				<br>
 
 				{% if network.generated %}
-				<a role="button" class="btn btn-outline-primary btn-lg my-3" href="{% url 'network_view' simulation.id %}" title="View a graph of the network">
+				<a role="button" class="btn btn-outline-primary btn-lg my-3" href="{% url 'metro:network_view' simulation.id %}" title="View a graph of the network">
 					<i class="fas fa-road"></i> Network View
 				</a>
 				{% elif complete_network %}
-				<a role="button" class="btn btn-outline-primary btn-lg my-3" data-toggle="modal" data-target="#loadingNetwork" onclick="runNetworkProgressBar()" href="{% url 'network_view' simulation.id %}" title="View a graph of the network">
+				<a role="button" class="btn btn-outline-primary btn-lg my-3" data-toggle="modal" data-target="#loadingNetwork" onclick="runNetworkProgressBar()" href="{% url 'metro:network_view' simulation.id %}" title="View a graph of the network">
 					<i class="fas fa-road"></i> Network View
 				</a>
 				{% else %}
@@ -87,19 +87,19 @@
 				{% endif %}
 				<br>
 				<div class="btn-group-vertical my-3" role="group">
-					<a role="button" class="btn btn-outline-primary" href="{% url 'object_view' simulation.id 'centroid' %}" title="View and edit the zones">
+					<a role="button" class="btn btn-outline-primary" href="{% url 'metro:object_view' simulation.id 'centroid' %}" title="View and edit the zones">
 						Zones
 					</a>
-					<a role="button" class="btn btn-outline-primary" href="{% url 'object_view' simulation.id 'crossing' %}" title="View and edit the intersections">
+					<a role="button" class="btn btn-outline-primary" href="{% url 'metro:object_view' simulation.id 'crossing' %}" title="View and edit the intersections">
 						Intersections
 					</a>
-					<a role="button" class="btn btn-outline-primary" href="{% url 'object_view' simulation.id 'function' %}" title="View and edit the congestion functions">
+					<a role="button" class="btn btn-outline-primary" href="{% url 'metro:object_view' simulation.id 'function' %}" title="View and edit the congestion functions">
 						Congestion functions
 					</a>
-					<a role="button" class="btn btn-outline-primary" href="{% url 'object_view' simulation.id 'link' %}" title="View and edit the links">
+					<a role="button" class="btn btn-outline-primary" href="{% url 'metro:object_view' simulation.id 'link' %}" title="View and edit the links">
 						Links
 					</a>
-					<a role="button" class="btn btn-outline-primary" href="{% url 'public_transit_view' simulation.id %}" title="View and edit the public transit system">
+					<a role="button" class="btn btn-outline-primary" href="{% url 'metro:public_transit_view' simulation.id %}" title="View and edit the public transit system">
 						Public transit
 					</a>
 				</div>
@@ -128,7 +128,7 @@
 
 				<br>
 
-				<a role="button" class="btn btn-outline-primary btn-lg my-3" href="{% url 'demand_view' simulation.id %}" title="View and edit the different traveler types">
+				<a role="button" class="btn btn-outline-primary btn-lg my-3" href="{% url 'metro:demand_view' simulation.id %}" title="View and edit the different traveler types">
 					<i class="fas fa-car"></i> Travelers
 				</a>
 			</center>
@@ -150,7 +150,7 @@
 
 				<br>
 
-				<a role="button" class="btn btn-outline-primary btn-lg my-3" href="{% url 'pricing_main' simulation.id %}" title="View and edit road pricing">
+				<a role="button" class="btn btn-outline-primary btn-lg my-3" href="{% url 'metro:pricing_main' simulation.id %}" title="View and edit road pricing">
 					<i class="fas fa-money-bill-wave"></i> Road pricing
 				</a>
 			</center>
@@ -180,7 +180,7 @@
 				<br>
 
 				{% if runs.in_progress %}
-				<a role="button" class="btn btn-outline-primary btn-lg my-3" href="{% url 'simulation_run_view' simulation.id runs.last.id %}" title="View details on the current run">
+				<a role="button" class="btn btn-outline-primary btn-lg my-3" href="{% url 'metro:simulation_run_view' simulation.id runs.last.id %}" title="View details on the current run">
 					<i class="fas fa-spinner"></i> Current run
 				</a>
 				{% else %}
@@ -206,7 +206,7 @@
 				{% endif %}
 				{% if runs.nb_run %}
 				<br>
-				<a role="button" class="btn btn-outline-primary my-3" href="{% url 'simulation_run_list' simulation.id %}" title="View information of the previous runs">
+				<a role="button" class="btn btn-outline-primary my-3" href="{% url 'metro:simulation_run_list' simulation.id %}" title="View information of the previous runs">
 					Run history
 				</a>
 				{% endif %}
@@ -224,7 +224,7 @@
 				<h4 class="mt-3">Parameters</h4>
 			</center>
 
-			<form id="paramForm" action="{% url 'simulation_view_save' simulation.id %}" method="post">
+			<form id="paramForm" action="{% url 'metro:simulation_view_save' simulation.id %}" method="post">
 				{% csrf_token %}
 				{{ simulation_form.id }}
 
@@ -354,7 +354,7 @@
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="{% url 'simulation_view_edit' simulation.id %}" method="post">
+			<form action="{% url 'metro:simulation_view_edit' simulation.id %}" method="post">
 				<div class="modal-body">
 					{% csrf_token %}
 					{% bootstrap_form edit_form show_help=False %}
@@ -386,7 +386,7 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary mx-auto" data-dismiss="modal">Close</button>
-				<a role="button" class="btn btn-danger mx-auto" href="{% url 'simulation_delete' simulation.id %}">Delete</a>
+				<a role="button" class="btn btn-danger mx-auto" href="{% url 'metro:simulation_delete' simulation.id %}">Delete</a>
 			</div>
 		</div>
 	</div>
@@ -403,7 +403,7 @@
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="{% url 'copy_simulation' %}" method="post">
+			<form action="{% url 'metro:copy_simulation' %}" method="post">
 				<div class="modal-body">
 					{% csrf_token %}
 					<input type="hidden" name="copy_id" id="copyId" value="">
@@ -438,7 +438,7 @@
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="{% url 'copy_simulation' %}" method="post">
+			<form action="{% url 'metro:copy_simulation' %}" method="post">
 				<div class="modal-body">
 					{% csrf_token %}
 					<input type="hidden" name="copy_id" id="copyId" value="">
@@ -473,7 +473,7 @@
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="{% url 'simulation_run_action' simulation.id %}" method="post">
+			<form action="{% url 'metro:simulation_run_action' simulation.id %}" method="post">
 				<div class="modal-body">
 					{% csrf_token %}
 					{% bootstrap_form run_form %}
@@ -509,7 +509,7 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<a role="button" class="btn btn-primary mx-auto" href="{% url 'simulation_view' simulation.id %}">Cancel</a>
+				<a role="button" class="btn btn-primary mx-auto" href="{% url 'metro:simulation_view' simulation.id %}">Cancel</a>
 			</div>
 		</div>
 	</div>
@@ -566,7 +566,7 @@ function runNetworkProgressBar() {
 	var right = true;
 
 	// Start loading the network page
-	window.location.href = '{% url 'network_view' simulation.id %}';
+	window.location.href = '{% url 'metro:network_view' simulation.id %}';
 
 	// Run the progress bar
 	window.setInterval(function(){

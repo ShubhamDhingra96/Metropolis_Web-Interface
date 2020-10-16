@@ -14,7 +14,7 @@ Metropolis
 		<div class="modal-header">
 			<h5 class="modal-title" id="modalEditTitle">Edit an event</h5>
 		</div>
-		<form action="{% url 'events_edit' event.id %}" method="post">
+		<form action="{% url 'metro:events_edit' event.id %}" method="post">
 			<div class="modal-body">
 				{% csrf_token %}
 				{% bootstrap_form form show_label=True %}

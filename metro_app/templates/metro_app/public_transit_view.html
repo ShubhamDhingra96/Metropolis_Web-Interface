@@ -31,7 +31,7 @@ This network has an incomplete public transit system.
 
 		<div class="btn-group my-3" role="group">
 			{% if not is_empty %}
-			<a role="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" href="{% url 'public_transit_list' simulation.id %}">
+			<a role="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" href="{% url 'metro:public_transit_list' simulation.id %}">
 				View 
 			</a>
 			{% else %}
@@ -49,7 +49,7 @@ This network has an incomplete public transit system.
 				Edit 
 			</button>
 			{% else %}
-			<a role="button" class="btn btn-outline-primary w-50" href="{% url 'public_transit_edit' simulation.id %}">
+			<a role="button" class="btn btn-outline-primary w-50" href="{% url 'metro:public_transit_edit' simulation.id %}">
 				Edit 
 			</a>
 			{% endif %}
@@ -60,7 +60,7 @@ This network has an incomplete public transit system.
 
 		<div class="btn-group my-3" role="group">
 			{% if not is_empty %}
-			<a role="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" href="{% url 'public_transit_export' simulation.id %}">
+			<a role="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" href="{% url 'metro:public_transit_export' simulation.id %}">
 				Export 
 			</a>
 			{% else %}
@@ -103,7 +103,7 @@ This network has an incomplete public transit system.
 
 <center>
 
-	<a role="button" class="btn btn-secondary mt-3" href="{% url 'simulation_view' simulation.id %}" title="Go back to the simulation view page">
+	<a role="button" class="btn btn-secondary mt-3" href="{% url 'metro:simulation_view' simulation.id %}" title="Go back to the simulation view page">
 		<span class="far fa-caret-square-left"></span> Back
 	</a>
 	
@@ -127,7 +127,7 @@ This network has an incomplete public transit system.
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary mx-auto" data-dismiss="modal">Close</button>
-				<a role="button" class="btn btn-danger mx-auto" href="{% url 'public_transit_delete' simulation.id %}">Delete</a>
+				<a role="button" class="btn btn-danger mx-auto" href="{% url 'metro:public_transit_delete' simulation.id %}">Delete</a>
 			</div>
 		</div>
 	</div>
@@ -143,7 +143,7 @@ This network has an incomplete public transit system.
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="{% url 'public_transit_import' simulation.id %}" method="post" enctype="multipart/form-data">
+			<form action="{% url 'metro:public_transit_import' simulation.id %}" method="post" enctype="multipart/form-data">
 				{% csrf_token %}
 				<div class="modal-body form-group">
 					The import file must be a tsv file with three columns: <i>origin</i>, <i>destination</i>  and <i>travel time</i>.
@@ -161,7 +161,7 @@ This network has an incomplete public transit system.
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary mx-auto" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary mx-auto" onclick="runProgressBar()">Import</button>
+					<button type="submit" class="btn btn-primary mx-auto" onclick="runProgressBar()">Import</a>
 				</div>
 			</form>
 		</div>

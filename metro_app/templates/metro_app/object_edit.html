@@ -12,14 +12,14 @@
 
 
 <center>
-	<a role="button" class="btn btn-secondary" href="{% url 'object_view' simulation.id object %}" title="Go back to the demand page">
+	<a role="button" class="btn btn-secondary" href="{% url 'metro:object_view' simulation.id object %}" title="Go back to the demand page">
 		<span class="far fa-caret-square-left"></span> Back
 	</a>
 </center>
 
 <br>
 
-<form id="objectForm" action="{% url 'object_edit_save' simulation.id object %}" method="post">
+<form id="objectForm" action="{% url 'metro:object_edit_save' simulation.id object %}" method="post">
 	{% csrf_token %}
 	{{ formset.management_form }}
 

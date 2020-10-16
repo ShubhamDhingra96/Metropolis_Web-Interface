@@ -8,20 +8,20 @@ from .models import *
 from .functions import *
 
 
-#====================
+# ====================
 # Forms
-#====================
+# ====================
 
 class UserCreationForm(UserCreationForm):
     """Form used to register a new user.
-    
+
     This is a modified version of the Django form. The e-mail field has been
     added.
     """
     email = forms.EmailField(
-            label="Email adress",
-            required=True,
-            help_text="Required.",
+        label="Email adress",
+        required=True,
+        help_text="Required.",
     )
 
     def __init__(self, *args, **kwargs):
@@ -43,6 +43,7 @@ class UserCreationForm(UserCreationForm):
             user.save()
         return user
 
+
 class LoginForm(forms.Form):
     """Form used to log an user in."""
     username = forms.CharField(label='Username')
@@ -55,8 +56,10 @@ class LoginForm(forms.Form):
         self.fields['password'].widget = forms.PasswordInput()
         self.fields['password'].widget.attrs['placeholder'] = 'Password'
 
+
 class CustomCheckboxInput(forms.CheckboxInput):
     """Custom CheckboxInput to work with the mysql database of metropolis."""
+
     def __init__(self, attrs=None):
         super().__init__(attrs)
         self.check_test = custom_check_test
@@ -69,15 +72,15 @@ class CustomCheckboxInput(forms.CheckboxInput):
             # If the checkbox is checked, return 'true'.
             return 'true'
 
-class BaseSimulationForm(forms.ModelForm):
 
+class BaseSimulationForm(forms.ModelForm):
     """Form to edit basic variables of a simulation (name, comment and public).
 
     The form is used to create new a simulation, to copy a simulation or to
     edit the variable of an existing simulation.
     """
 
-    #environment = forms.ModelChoiceField(queryset=Environment.objects.none())
+    # environment = forms.ModelChoiceField(queryset=Environment.objects.none())
     zipfile = forms.FileField()
 
     def __init__(self, user, *args, **kwargs):
@@ -95,7 +98,7 @@ class BaseSimulationForm(forms.ModelForm):
         for bound_field in self:
             bound_field.field.widget.attrs['title'] = bound_field.help_text
 
-        #if self.fields.widget.att
+        # if self.fields.widget.att
 
     class Meta:
         model = Simulation
@@ -104,14 +107,13 @@ class BaseSimulationForm(forms.ModelForm):
 
 # Code added by Shubham for making a new form which will help in importing the Simulation.
 class SimulationImportForm(forms.ModelForm):
-
     """Form to edit basic variables of a simulation (name, comment and public).
 
     The form is used to create new a simulation, to copy a simulation or to
     edit the variable of an existing simulation.
     """
 
-    #environment = forms.ModelChoiceField(queryset=Environment.objects.none())
+    # environment = forms.ModelChoiceField(queryset=Environment.objects.none())
     zipfile = forms.FileField
 
     def __init__(self, user, *args, **kwargs):
@@ -129,17 +131,16 @@ class SimulationImportForm(forms.ModelForm):
         for bound_field in self:
             bound_field.field.widget.attrs['title'] = bound_field.help_text
 
-        #if self.fields.widget.att
+        # if self.fields.widget.att
 
     class Meta:
         model = Simulation
         fields = ['name', 'comment', 'environment', 'contact', 'public']
 
 
-
-
 class ParametersSimulationForm(forms.ModelForm):
     """Form to edit the parameters of a simulation."""
+
     def __init__(self, owner=False, *args, **kwargs):
         super(ParametersSimulationForm, self).__init__(*args, **kwargs)
         # Disable all fields if the user is not owner.
@@ -186,8 +187,10 @@ class ParametersSimulationForm(forms.ModelForm):
             'horizontalQueueing': CustomCheckboxInput(),
         }
 
+
 class RunForm(forms.ModelForm):
     """Form to give a name to a SimulationRun."""
+
     def save(self, simulation, commit=True):
         # Save the SimulationRun with the specified Simulation.
         instance = super(RunForm, self).save(commit=False)
@@ -199,6 +202,7 @@ class RunForm(forms.ModelForm):
     class Meta:
         model = SimulationRun
         fields = ['name']
+
 
 class UserTypeForm(forms.ModelForm):
     """Form to edit an user type, including the distributions."""
@@ -246,7 +250,7 @@ class UserTypeForm(forms.ModelForm):
         super(UserTypeForm, self).__init__(*args, **kwargs)
         # Some fields are not required.
         not_required_fields = [
-                'name', 'comment', 'modeChoice', 'modeShortRun', 'localATIS',
+            'name', 'comment', 'modeChoice', 'modeShortRun', 'localATIS',
         ]
         for field in not_required_fields:
             self.fields[field].required = False
@@ -254,8 +258,8 @@ class UserTypeForm(forms.ModelForm):
         for bound_field in self:
             bound_field.field.widget.attrs['title'] = bound_field.help_text
         self.fields['scale'].widget.attrs['title'] = (
-            'All values in the O-D matrix of the traveler type are multiplied '
-            + 'by the scale value'
+                'All values in the O-D matrix of the traveler type are multiplied '
+                + 'by the scale value'
         )
         # Add initial scale value.
         self.fields['scale'].initial = \
@@ -366,20 +370,26 @@ class UserTypeForm(forms.ModelForm):
             'localATIS': CustomCheckboxInput(),
         }
 
+
 class MatrixForm(forms.ModelForm):
     """Form to edit an OD pair."""
+
     class Meta:
         model = Matrix
         fields = ['r']
 
+
 class PolicyForm(forms.ModelForm):
     """Form to edit pricing policy."""
+
     class Meta:
         model = Policy
-        fields = ['usertype','location', 'baseValue','timeVector','valueVector']
+        fields = ['usertype', 'location', 'baseValue', 'timeVector', 'valueVector']
+
 
 class CentroidForm(forms.ModelForm):
     """Form the edit the centroids."""
+
     def __init__(self, *args, **kwargs):
         super(CentroidForm, self).__init__(*args, **kwargs)
         # Field name is not required.
@@ -410,8 +420,10 @@ class CentroidForm(forms.ModelForm):
         model = Centroid
         fields = ['name', 'x', 'y', 'user_id']
 
+
 class CrossingForm(forms.ModelForm):
     """Form to edit the crossings."""
+
     def __init__(self, *args, **kwargs):
         super(CrossingForm, self).__init__(*args, **kwargs)
         # Field name is not required.
@@ -441,6 +453,7 @@ class CrossingForm(forms.ModelForm):
         model = Crossing
         fields = ['name', 'x', 'y', 'user_id']
 
+
 class LinkForm(forms.ModelForm):
     """Form to edit the links."""
     origin = forms.ChoiceField()
@@ -456,7 +469,7 @@ class LinkForm(forms.ModelForm):
         self.fields['destination'].choices = node_choices
         # The choices for vdf are the functions of the associated function set.
         self.fields['vdf'].queryset = Function.objects.filter(
-                functionset__supply__scenario__simulation=simulation
+            functionset__supply__scenario__simulation=simulation
         )
         # Add tooltips.
         for bound_field in self:
@@ -482,12 +495,14 @@ class LinkForm(forms.ModelForm):
     class Meta:
         model = Link
         fields = [
-                'name', 'origin', 'destination', 'lanes', 'length', 'speed',
-                'vdf', 'capacity', 'user_id'
+            'name', 'origin', 'destination', 'lanes', 'length', 'speed',
+            'vdf', 'capacity', 'user_id'
         ]
+
 
 class FunctionForm(forms.ModelForm):
     """Form to edit the congestion functions."""
+
     def __init__(self, *args, **kwargs):
         super(FunctionForm, self).__init__(*args, **kwargs)
         # Field name is not required.
@@ -508,12 +523,14 @@ class FunctionForm(forms.ModelForm):
         model = Function
         fields = ['name', 'expression', 'user_id']
         widgets = {
-                'expression': forms.TextInput(),
+            'expression': forms.TextInput(),
         }
+
 
 class ImportForm(forms.Form):
     """Simple form to import a file."""
     import_file = forms.FileField()
+
 
 class CentroidModelFormSet(BaseModelFormSet):
     def __init__(self, *args, **kwargs):
@@ -539,6 +556,7 @@ class CentroidModelFormSet(BaseModelFormSet):
                     )
                 user_ids.append(user_id)
 
+
 class CrossingModelFormSet(BaseModelFormSet):
     def __init__(self, *args, **kwargs):
         self.simulation = kwargs.pop('simulation')
@@ -563,6 +581,7 @@ class CrossingModelFormSet(BaseModelFormSet):
                     )
                 user_ids.append(user_id)
 
+
 class LinkModelFormSet(BaseModelFormSet):
     def __init__(self, *args, **kwargs):
         self.simulation = kwargs.pop('simulation')
@@ -585,6 +604,7 @@ class LinkModelFormSet(BaseModelFormSet):
                         '(id: {}).'.format(user_id)
                     )
                 user_ids.append(user_id)
+
 
 class FunctionModelFormSet(BaseModelFormSet):
     def __init__(self, *args, **kwargs):
@@ -609,20 +629,24 @@ class FunctionModelFormSet(BaseModelFormSet):
                     )
                 user_ids.append(user_id)
 
+
 class EventForm(forms.Form):
     title = forms.CharField()
     description = forms.CharField(required=False, widget=forms.Textarea(
-        attrs={"cols":20}))
+        attrs={"cols": 20}))
+
 
 class ArticleForm(forms.Form):
     title = forms.CharField()
     description = forms.CharField(required=False, widget=forms.Textarea(
-        attrs={"cols":20}))
+        attrs={"cols": 20}))
     files = forms.FileField(widget=forms.ClearableFileInput(attrs={
         'multiple': True}), required=False)
 
+
 class EnvironmentForm(forms.Form):
     name = forms.CharField(max_length=200)
+
 
 class EnvironmentUserAddForm(forms.Form):
     username = forms.CharField(max_length=150, required=True)
@@ -634,7 +658,7 @@ class EnvironmentUserAddForm(forms.Form):
             return valid
 
         try:
-            user = User.objects.get(username = self.cleaned_data['username'])
+            user = User.objects.get(username=self.cleaned_data['username'])
 
         except User.DoesNotExist:
             self._errors['no_user'] = 'User does not exist'
@@ -642,9 +666,10 @@ class EnvironmentUserAddForm(forms.Form):
 
         return True
 
-#====================
+
+# ====================
 # FormSets
-#====================
+# ====================
 
 MatrixFormSet = modelformset_factory(
     Matrix,
@@ -659,7 +684,7 @@ PolicyFormSet = modelformset_factory(
 )
 
 CentroidFormSet = modelformset_factory(
-    Centroid, 
+    Centroid,
     form=CentroidForm,
     formset=CentroidModelFormSet,
     can_delete=True,
@@ -667,7 +692,7 @@ CentroidFormSet = modelformset_factory(
 )
 
 CentroidFormSetExtra = modelformset_factory(
-    Centroid, 
+    Centroid,
     form=CentroidForm,
     formset=CentroidModelFormSet,
     can_delete=True,
@@ -675,7 +700,7 @@ CentroidFormSetExtra = modelformset_factory(
 )
 
 CrossingFormSet = modelformset_factory(
-    Crossing, 
+    Crossing,
     form=CrossingForm,
     formset=CrossingModelFormSet,
     can_delete=True,
@@ -683,7 +708,7 @@ CrossingFormSet = modelformset_factory(
 )
 
 CrossingFormSetExtra = modelformset_factory(
-    Crossing, 
+    Crossing,
     form=CrossingForm,
     formset=CrossingModelFormSet,
     can_delete=True,
@@ -691,7 +716,7 @@ CrossingFormSetExtra = modelformset_factory(
 )
 
 LinkFormSet = modelformset_factory(
-    Link, 
+    Link,
     form=LinkForm,
     formset=LinkModelFormSet,
     can_delete=True,
@@ -699,7 +724,7 @@ LinkFormSet = modelformset_factory(
 )
 
 LinkFormSetExtra = modelformset_factory(
-    Link, 
+    Link,
     form=LinkForm,
     formset=LinkModelFormSet,
     can_delete=True,

@@ -89,7 +89,7 @@ def public_required(view):
         if can_view(user, simulation):
             return view(*args, simulation=simulation, **kwargs)
         else:
-            return HttpResponseRedirect(reverse('simulation_manager'))
+            return HttpResponseRedirect(reverse('metro:simulation_manager'))
 
     return wrap
 
@@ -108,7 +108,7 @@ def owner_required(view):
         if can_edit(user, simulation):
             return view(*args, simulation=simulation, **kwargs)
         else:
-            return HttpResponseRedirect(reverse('simulation_manager'))
+            return HttpResponseRedirect(reverse('metro:simulation_manager'))
 
     return wrap
 
@@ -133,7 +133,7 @@ def check_demand_relation(view):
                         demandsegment=demandsegment)
         else:
             # The demand segment id not related to the simulation.
-            return HttpResponseRedirect(reverse('simulation_manager'))
+            return HttpResponseRedirect(reverse('metro:simulation_manager'))
 
     return wrap
 
@@ -174,7 +174,7 @@ def check_run_relation(view):
                         run=run)
         else:
             # The run id not related to the simulation.
-            return HttpResponseRedirect(reverse('simulation_manager'))
+            return HttpResponseRedirect(reverse('metro:simulation_manager'))
 
     return wrap
 
@@ -191,10 +191,9 @@ def environment_owner_required(view):
         if can_edit_environment(user, environment):
             return view(*args, environment=environment_id, **kwargs)
         else:
-            return HttpResponseRedirect(reverse('environments_view'))
+            return HttpResponseRedirect(reverse('metro:environments_view'))
 
     return wrap
-
 
 def environment_can_create(view):
     """Decorator to execute a function only if the requesting user can create an environment.
@@ -206,7 +205,7 @@ def environment_can_create(view):
         if user.has_perm('metro_app.add_environment'):
             return view(*args, **kwargs)
         else:
-            return HttpResponseRedirect(reverse('simulation_manager'))
+            return HttpResponseRedirect(reverse('metro:simulation_manager'))
 
     return wrap
 
@@ -289,7 +288,7 @@ def register_action(request):
                 'error': register_form.errors
             }
             return render(request, 'metro_app/register.html', context)
-    return HttpResponseRedirect(reverse('simulation_manager'))
+    return HttpResponseRedirect(reverse('metro:simulation_manager'))
 
 
 def login_action(request):
@@ -306,7 +305,7 @@ def login_action(request):
             else:
                 # Authentication failed.
                 return HttpResponseRedirect(
-                    reverse('login', kwargs={'login_error': True})
+                    reverse('metro:login', kwargs={'login_error': True})
                 )
         else:
             error = login_form.errors
@@ -316,7 +315,7 @@ def login_action(request):
                 'error': error
             }
             return render(request, 'metro_app/login.html', context)
-    return HttpResponseRedirect(reverse('simulation_manager'))
+    return HttpResponseRedirect(reverse('metro:simulation_manager'))
 
 
 @login_required
@@ -324,13 +323,13 @@ def logout_action(request):
     """View triggered when an user logout."""
     if request.user.is_authenticated:
         logout(request)
-    return HttpResponseRedirect(reverse('simulation_manager'))
+    return HttpResponseRedirect(reverse('metro:simulation_manager'))
 
 
 class PasswordResetView(auth_views.PasswordResetView):
     template_name = 'metro_app/password_reset.html'
     email_template_name = 'metro_app/password_reset_email.html'
-    success_url = reverse_lazy('password_reset_done')
+    success_url = reverse_lazy('metro:password_reset_done')
 
 
 class PasswordResetDoneView(auth_views.PasswordResetDoneView):
@@ -339,7 +338,7 @@ class PasswordResetDoneView(auth_views.PasswordResetDoneView):
 
 class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
     template_name = 'metro_app/password_reset_confirm.html'
-    success_url = reverse_lazy('simulation_manager')
+    success_url = reverse_lazy('metro:simulation_manager')
     post_reset_login = True
 
 
@@ -463,11 +462,11 @@ def simulation_add_action(request):
         simulation.scenario = scenario
         simulation.save()
         return HttpResponseRedirect(
-            reverse('simulation_view', args=(simulation.id,))
+            reverse('metro:simulation_view', args=(simulation.id,))
         )
     else:
         # I do not see how errors could happen.
-        return HttpResponseRedirect(reverse('simulation_manager'))
+        return HttpResponseRedirect(reverse('metro:simulation_manager'))
 
 
 @require_POST
@@ -891,9 +890,9 @@ def copy_simulation(request):
             simulation.has_changed = True
             simulation.save()
         return HttpResponseRedirect(
-            reverse('simulation_view', args=(simulation.id,))
+            reverse('metro:simulation_view', args=(simulation.id,))
         )
-    return HttpResponseRedirect(reverse('simulation_manager'))
+    return HttpResponseRedirect(reverse('metro:simulation_manager'))
 
 
 @owner_required
@@ -909,7 +908,7 @@ def simulation_delete(request, simulation):
     network.delete()
     functionset.delete()
     demand.delete()
-    return HttpResponseRedirect(reverse('simulation_manager'))
+    return HttpResponseRedirect(reverse('metro:simulation_manager'))
 
 
 @public_required
@@ -1019,7 +1018,7 @@ def simulation_view_save(request, simulation):
             simulation.iterations = 0
             simulation.save()
         return HttpResponseRedirect(
-            reverse('simulation_view',
+            reverse('metro:simulation_view',
                     args=(simulation.id,))
         )
     else:
@@ -1041,7 +1040,7 @@ def simulation_view_edit(request, simulation):
     if edit_form.is_valid():
         edit_form.save()
         return HttpResponseRedirect(
-            reverse('simulation_view',
+            reverse('metro:simulation_view',
                     args=(simulation.id,))
         )
     else:
@@ -1135,7 +1134,7 @@ def usertype_add(request, simulation):
     demandsegment.demand.add(simulation.scenario.demand)
     # Return the view to edit the new user type.
     return HttpResponseRedirect(
-        reverse('usertype_edit', args=(simulation.id, demandsegment.id,))
+        reverse('metro:usertype_edit', args=(simulation.id, demandsegment.id,))
     )
 
 
@@ -1185,7 +1184,7 @@ def usertype_edit_save(request, simulation, demandsegment):
                 simulation.has_changed = True
                 simulation.save()
         return HttpResponseRedirect(
-            reverse('demand_view',
+            reverse('metro:demand_view',
                     args=(simulation.id,))
         )
     else:
@@ -1207,7 +1206,7 @@ def usertype_delete(request, simulation, demandsegment):
     simulation.has_changed = True
     simulation.save()
     return HttpResponseRedirect(
-        reverse('demand_view', args=(simulation.id,))
+        reverse('metro:demand_view', args=(simulation.id,))
     )
 
 
@@ -1373,7 +1372,7 @@ def matrix_save(request, simulation, demandsegment):
         }
         return render(request, 'metro_app/errors.html', context)
     return HttpResponseRedirect(reverse(
-        'matrix_edit', args=(simulation.id, demandsegment.id,)
+        'metro:matrix_edit', args=(simulation.id, demandsegment.id,)
     ))
 
 
@@ -1458,7 +1457,7 @@ def matrix_reset(request, simulation, demandsegment):
     matrix.total = 0
     matrix.save()
     return HttpResponseRedirect(reverse(
-        'matrix_main', args=(simulation.id, demandsegment.id,)
+        'metro:matrix_main', args=(simulation.id, demandsegment.id,)
     ))
 
 
@@ -1539,7 +1538,7 @@ def pricing_save(request, simulation):
         return render(request, 'metro_app/errors.html', context)
 
     return HttpResponseRedirect(reverse(
-        'pricing_edit', args=(simulation.id, demandsegment.id,)
+        'metro:pricing_edit', args=(simulation.id, demandsegment.id,)
     ))
 
 
@@ -1637,7 +1636,7 @@ def pricing_reset(request, simulation):
     # Delete the Policy objects (the LinkSelection objects are not deleted).
     tolls.delete()
     return HttpResponseRedirect(reverse(
-        'pricing_main', args=(simulation.id,)
+        'metro:pricing_main', args=(simulation.id,)
     ))
 
 
@@ -1782,7 +1781,7 @@ def public_transit_edit_save(request, simulation):
         }
         return render(request, 'metro_app/errors.html', context)
     return HttpResponseRedirect(reverse(
-        'public_transit_edit', args=(simulation.id,)
+        'metro:public_transit_edit', args=(simulation.id,)
     ))
 
 
@@ -1794,7 +1793,7 @@ def public_transit_delete(request, simulation):
     od_pairs = get_query('public_transit', simulation)
     od_pairs.delete()
     return HttpResponseRedirect(reverse(
-        'public_transit_view', args=(simulation.id,)
+        'metro:public_transit_view', args=(simulation.id,)
     ))
 
 
@@ -1953,7 +1952,7 @@ def object_edit_save(request, simulation, object_name):
         simulation.has_changed = True
         simulation.save()
         return HttpResponseRedirect(reverse(
-            'object_edit', args=(simulation.id, object_name,)
+            'metro:object_edit', args=(simulation.id, object_name,)
         ))
     else:
         # Redirect to a page with the errors.
@@ -2149,7 +2148,7 @@ def object_delete(request, simulation, object_name):
     simulation.has_changed = True
     simulation.save()
     return HttpResponseRedirect(reverse(
-        'object_view', args=(simulation.id, object_name,)
+        'metro:object_view', args=(simulation.id, object_name,)
     ))
 
 
@@ -2168,10 +2167,10 @@ def simulation_run_action(request, simulation):
             run = run_form.save(simulation)
             run_simulation(run)
         return HttpResponseRedirect(
-            reverse('simulation_run_view', args=(simulation.id, run.id,))
+            reverse('metro:simulation_run_view', args=(simulation.id, run.id,))
         )
     return HttpResponseRedirect(reverse(
-        'simulation_run_list', args=(simulation.id,)
+        'metro:simulation_run_list', args=(simulation.id,)
     ))
 
 
@@ -2189,7 +2188,7 @@ def simulation_run_stop(request, simulation, run):
         run.status = 'Aborted'
         run.save()
     return HttpResponseRedirect(reverse(
-        'simulation_run_view', args=(simulation.id, run.id,)
+        'metro:simulation_run_view', args=(simulation.id, run.id,)
     ))
 
 
@@ -2547,7 +2546,7 @@ def show_events(request):
 def create_event(request):
     # Could be changed to a wrapper but can't figure out how to access user from wrapper
     if not request.user.is_superuser:
-        return HttpResponseRedirect(reverse('simulation_manager'))
+        return HttpResponseRedirect(reverse('metro:simulation_manager'))
 
     my_form = EventForm(request.POST or None)
     if my_form.is_valid():
@@ -2558,29 +2557,27 @@ def create_event(request):
 
         my_form = EventForm()
 
-    return HttpResponseRedirect(reverse('events_view'))
-
+    return HttpResponseRedirect(reverse('metro:events_view'))
 
 @user_passes_test(lambda u: u.is_superuser)
 def delete_event(request, pk):
     # Could be changed to a wrapper but can't figure out how to access user from wrapper
     if not request.user.is_superuser:
-        return HttpResponseRedirect(reverse('simulation_manager'))
+        return HttpResponseRedirect(reverse('metro:simulation_manager'))
 
     event = get_object_or_404(Event, id=pk)
 
     if request.method == 'POST':
         event.delete()
 
-    return HttpResponseRedirect(reverse('events_view'))
-
+    return HttpResponseRedirect(reverse('metro:events_view'))
 
 # Loads the edit Event page
 @user_passes_test(lambda u: u.is_superuser)
 def edit_event_show(request, pk):
     # Could be changed to a wrapper but can't figure out how to access user from wrapper
     if not request.user.is_superuser:
-        return HttpResponseRedirect(reverse('simulation_manager'))
+        return HttpResponseRedirect(reverse('metro:simulation_manager'))
 
     event = get_object_or_404(Event, id=pk)
     my_form = EventForm(initial={'title': event.title, 'description': event.description})
@@ -2588,12 +2585,11 @@ def edit_event_show(request, pk):
     context = {'event': event, 'form': my_form}
     return render(request, 'metro_app/events_edit.html', context)
 
-
 @user_passes_test(lambda u: u.is_superuser)
 def edit_event(request, pk):
     # Could be changed to a wrapper but can't figure out how to access user from wrapper
     if not request.user.is_superuser:
-        return HttpResponseRedirect(reverse('simulation_manager'))
+        return HttpResponseRedirect(reverse('metro:simulation_manager'))
 
     event = get_object_or_404(Event, id=pk)
     my_form = EventForm(request.POST)
@@ -2607,7 +2603,7 @@ def edit_event(request, pk):
                                                    description=event_description,
                                                    date=datetime.datetime.now())
 
-    return HttpResponseRedirect(reverse('events_view'))
+    return HttpResponseRedirect(reverse('metro:events_view'))
 
 
 def show_articles(request):
@@ -2648,7 +2644,7 @@ def download_article_file(request, path):
 def create_article(request):
     # Could be changed to a wrapper but can't figure out how to access user from wrapper
     if not request.user.is_superuser:
-        return HttpResponseRedirect(reverse('simulation_manager'))
+        return HttpResponseRedirect(reverse('metro:simulation_manager'))
 
     my_form = ArticleForm(request.POST or None)
     files = request.FILES.getlist('files')
@@ -2670,22 +2666,20 @@ def create_article(request):
     else:
         print(my_form.errors)
 
-    return HttpResponseRedirect(reverse('articles_view'))
-
+    return HttpResponseRedirect(reverse('metro:articles_view'))
 
 @user_passes_test(lambda u: u.is_superuser)
 def delete_article(request, pk):
     # Could be changed to a wrapper but can't figure out how to access user from wrapper
     if not request.user.is_superuser:
-        return HttpResponseRedirect(reverse('simulation_manager'))
+        return HttpResponseRedirect(reverse('metro:simulation_manager'))
 
     article = get_object_or_404(Article, id=pk)
 
     if request.method == 'POST':
         article.delete()
 
-    return HttpResponseRedirect(reverse('articles_view'))
-
+    return HttpResponseRedirect(reverse('metro:articles_view'))
 
 @public_required
 def simulation_export(request, simulation):
@@ -2916,6 +2910,8 @@ def environment_create(request):
     return HttpResponseRedirect(reverse('environments_view'))
 
 
+    return HttpResponseRedirect(reverse('metro:environments_view'))
+
 @login_required
 @environment_owner_required
 def environment_add_view(request, environment):
@@ -2939,7 +2935,8 @@ def environment_add(request, environment):
         env.users.add(user)
 
         my_form = EnvironmentUserAddForm()
-        return HttpResponseRedirect(reverse('environments_view'))
+        return HttpResponseRedirect(reverse('metro:environments_view'))
+
 
     context = {'environment': env, 'form': my_form, 'error': True}
     return render(request, 'metro_app/environments_edit.html', context)
@@ -2953,8 +2950,7 @@ def environment_user_delete(request, environment, user):
     if request.method == 'POST':
         env.users.remove(user)
 
-    return HttpResponseRedirect(reverse('environments_view'))
-
+    return HttpResponseRedirect(reverse('metro:environments_view'))
 
 @login_required
 @environment_owner_required
@@ -2962,7 +2958,7 @@ def environment_delete(request, environment):
     env = get_object_or_404(Environment, id=environment)
     env.delete()
 
-    return HttpResponseRedirect(reverse('environments_view'))
+    return HttpResponseRedirect(reverse('metro:environments_view'))
 
 
 # ====================
@@ -3286,7 +3282,7 @@ def simulation_import_action(request):
                     usertype_import_function(file.open(matrix), simulation)
 
         return HttpResponseRedirect(
-            reverse('simulation_view', args=(simulation.id,))
+            reverse('metro:simulation_view', args=(simulation.id,))
         )
     else:
         return HttpResponseRedirect(reverse('simulation_manager'))

@@ -1,9 +1,9 @@
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 from metro_app import views
-
 app_name = 'metro'
 urlpatterns = [
     #Lucas Hornung
+    #path('', include(('metro.metro.urls', 'metro'), namespace= 'metro')),
     path(r'events_view', views.show_events, name='events_view'),
     path(r'events_view/add_event', views.create_event, name='events_add'),
     re_path(r'delete_event/(?P<pk>[0-9]+)/', views.delete_event,

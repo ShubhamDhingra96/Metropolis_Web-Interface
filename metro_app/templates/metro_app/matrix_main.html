@@ -31,7 +31,7 @@
 
 			<div class="btn-group my-1" role="group">
 				{% if has_centroid and total %}
-				<a role="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" href="{% url 'matrix_view' simulation.id demandsegment.id %}">
+				<a role="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" href="{% url 'metro:matrix_view' simulation.id demandsegment.id %}">
 					View O-D matrix
 				</a>
 				{% elif has_centroid %}
@@ -49,7 +49,7 @@
 					Edit O-D matrix
 				</button>
 				{% elif has_centroid %}
-				<a role="button" class="btn btn-outline-primary w-50" href="{% url 'matrix_edit' simulation.id demandsegment.id %}">
+				<a role="button" class="btn btn-outline-primary w-50" href="{% url 'metro:matrix_edit' simulation.id demandsegment.id %}">
 					Edit O-D matrix
 				</a>
 				{% else %}
@@ -62,7 +62,7 @@
 			<br>
 			<div class="btn-group my-1" role="group">
 				{% if has_centroid and demandsegment.matrix.total %}
-				<a role="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" href="{% url 'matrix_export' simulation.id demandsegment.id %}">
+				<a role="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" href="{% url 'metro:matrix_export' simulation.id demandsegment.id %}">
 					Export O-D matrix
 				</a>
 				{% elif has_centroid %}
@@ -109,7 +109,7 @@
 
 	<center>
 
-		<a role="button" class="btn btn-secondary mt-3" href="{% url 'demand_view' simulation.id %}" title="Go back to the traveler type page">
+		<a role="button" class="btn btn-secondary mt-3" href="{% url 'metro:demand_view' simulation.id %}" title="Go back to the traveler type page">
 			<span class="far fa-caret-square-left"></span> Back
 		</a>
 		
@@ -133,7 +133,7 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary mx-auto" data-dismiss="modal">Close</button>
-				<a role="button" class="btn btn-danger mx-auto" href="{% url 'matrix_reset' simulation.id demandsegment.id %}">Delete</a>
+				<a role="button" class="btn btn-danger mx-auto" href="{% url 'metro:matrix_reset' simulation.id demandsegment.id %}">Delete</a>
 			</div>
 		</div>
 	</div>
@@ -148,7 +148,7 @@
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="{% url 'matrix_import' simulation.id demandsegment.id %}" method="post" enctype="multipart/form-data">
+			<form action="{% url 'metro:matrix_import' simulation.id demandsegment.id %}" method="post" enctype="multipart/form-data">
 				{% csrf_token %}
 				<div class="modal-body form-group">
 					The import file must be a tsv file with three columns: <i>origin</i>, <i>destination</i>  and <i>population</i>.
@@ -166,7 +166,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary mx-auto" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary mx-auto" onclick="runProgressBar()">Import</button>
+					<button type="submit" class="btn btn-primary mx-auto" onclick="runProgressBar()">Import</a>
 				</div>
 			</form>
 		</div>

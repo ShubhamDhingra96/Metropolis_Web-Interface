@@ -66,7 +66,7 @@
 
 			<div class="btn-group my-3" role="group">
 				{% if count %}
-				<a role="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" href="{% url 'object_list' simulation.id object %}">
+				<a role="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" href="{% url 'metro:object_list' simulation.id object %}">
 					List {{ object|metro_to_user }}s
 				</a>
 				{% else %}
@@ -84,7 +84,7 @@
 					Edit {{ object|metro_to_user }}s
 				</button>
 				{% else %}
-				<a role="button" class="btn btn-outline-primary w-50" href="{% url 'object_edit' simulation.id object %}">
+				<a role="button" class="btn btn-outline-primary w-50" href="{% url 'metro:object_edit' simulation.id object %}">
 					Edit {{ object|metro_to_user }}s
 				</a>
 				{% endif %}
@@ -95,7 +95,7 @@
 
 			<div class="btn-group my-3" role="group">
 				{% if count %}
-				<a role="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" href="{% url 'object_export' simulation.id object %}">
+				<a role="button" class="btn btn-outline-primary{% if owner %} w-50{% endif %}" href="{% url 'metro:object_export' simulation.id object %}">
 					Export {{ object|metro_to_user }}s
 				</a>
 				{% else %}
@@ -138,7 +138,7 @@
 
 	<center>
 
-		<a role="button" class="btn btn-secondary mt-3" href="{% url 'simulation_view' simulation.id %}" title="Go back to the simulation view page">
+		<a role="button" class="btn btn-secondary mt-3" href="{% url 'metro:simulation_view' simulation.id %}" title="Go back to the simulation view page">
 			<span class="far fa-caret-square-left"></span> Back
 		</a>
 		
@@ -162,7 +162,7 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary mx-auto" data-dismiss="modal">Close</button>
-				<a role="button" class="btn btn-danger mx-auto" href="{% url 'object_delete' simulation.id object %}">Delete</a>
+				<a role="button" class="btn btn-danger mx-auto" href="{% url 'metro:object_delete' simulation.id object %}">Delete</a>
 			</div>
 		</div>
 	</div>
@@ -178,7 +178,7 @@
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="{% url 'object_import' simulation.id object %}" method="post" enctype="multipart/form-data">
+			<form action="{% url 'metro:object_import' simulation.id object %}" method="post" enctype="multipart/form-data">
 				{% csrf_token %}
 				<div class="modal-body form-group">
 					{% if object == 'centroid' %}
@@ -206,7 +206,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary mx-auto" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary mx-auto" onclick="runProgressBar()">Import</button>
+					<button type="submit" class="btn btn-primary mx-auto" onclick="runProgressBar()">Import</a>
 				</div>
 			</form>
 		</div>

@@ -26,16 +26,14 @@ Metropolis
 			<div class="modal-header">
 				<h5 class="modal-title" id="modalTitle">Create a new simulation</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-`               <span aria-hidden="true">&times;</span>
+					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-            <form action="{% url 'simulation_add_action' %}" method="post">
+			<form action="{% url 'metro:simulation_add_action' %}" method="post">
 				<div class="modal-body">
-                    {% csrf_token %}
+					{% csrf_token %}
 					{% bootstrap_form simulation_form show_help=False %}
-
 				</div>
-
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary mx-auto" data-dismiss="modal">Close</button>
 					<button type="submit" class="btn btn-primary mx-auto">Create</button>
@@ -55,7 +53,7 @@ Metropolis
 `               <span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-            <form action="{% url 'simulation_import_action' %}" method="post" enctype="multipart/form-data" >
+            <form action="{% url 'metro:simulation_import_action' %}" method="post" enctype="multipart/form-data" >
 				<div class="modal-body">
                     {% csrf_token %}
                     {% bootstrap_form simulation_form show_help=False %}
@@ -97,10 +95,10 @@ Metropolis
 			<td class="align-middle">{{ simulation.environment }}</td>
 			<td class="align-middle">{% if simulation.public %}Public{% else %}Private{% endif %}</td>
 			<td>
-				<a role="button" class="btn btn-outline-primary btn-block" href="{% url 'simulation_view' simulation.id %}"><i class="far fa-edit"></i> Edit</a>
+				<a role="button" class="btn btn-outline-primary btn-block" href="{% url 'metro:simulation_view' simulation.id %}"><i class="far fa-edit"></i> Edit</a>
 				<button type="button" class="btn btn-outline-primary btn-block" data-toggle="modal" data-target="#copyModal" onclick="updateCopyInput('{{ simulation.name }}', {{ simulation.id }});"><i class="far fa-clone"></i> Copy</button>
-				<a role="button" class="btn btn-outline-primary btn-block" href="{% url 'simulation_export' simulation.id %}"><i class="fas fa-download"></i>Export</a>
-                <!-- <a role="button" class="btn btn-outline-primary btn-block" data-target="importUsertypeModal" href="{% url 'simulation_export' simulation.id %}"><i class="fas fa-plus-circle"></i>Import</a> -->
+				<a role="button" class="btn btn-outline-primary btn-block" href="{% url 'metro:simulation_export' simulation.id %}"><i class="fas fa-download"></i>Export</a>
+                <!-- <a role="button" class="btn btn-outline-primary btn-block" data-target="importUsertypeModal" href="{% url 'metro:simulation_export' simulation.id %}"><i class="fas fa-plus-circle"></i>Import</a> -->
 				<button type="button" class="btn btn-outline-primary btn-block" data-toggle="modal" data-target="#deleteModal_{{ simulation.id }}"><i class="far fa-trash-alt"></i> Delete</button>
 			</td>
 		</tr>
@@ -181,9 +179,9 @@ Metropolis
 			{% endif %}
 			<td class="align-middle">{% if simulation.public %}Public{% else %}Private{% endif %}</td>
 			<td>
-				<a role="button" class="btn btn-outline-primary btn-block" href="{% url 'simulation_view' simulation.id %}"><i class="far fa-eye"></i> View</a>
+				<a role="button" class="btn btn-outline-primary btn-block" href="{% url 'metro:simulation_view' simulation.id %}"><i class="far fa-eye"></i> View</a>
 				<button type="button" class="btn btn-outline-primary btn-block" data-toggle="modal" data-target="#copyModal" onclick="updateCopyInput('{{ simulation.name }}', {{ simulation.id }});"><i class="far fa-clone"></i> Copy</button>
-				<a role="button" class="btn btn-outline-primary btn-block" href="{% url 'simulation_export' simulation.id %}"><i class="fas fa-download"></i>Export</a>
+				<a role="button" class="btn btn-outline-primary btn-block" href="{% url 'metro:simulation_export' simulation.id %}"><i class="fas fa-download"></i>Export</a>
 			</td>
 		</tr>
 	{% endfor %}
@@ -214,10 +212,10 @@ Metropolis
 			<td class="align-middle">{{ simulation.user }}</td>
 			{% endif %}
 			<td>
-				<a role="button" class="btn btn-outline-primary btn-block" href="{% url 'simulation_view' simulation.id %}"><i class="far fa-eye"></i> View</a>
+				<a role="button" class="btn btn-outline-primary btn-block" href="{% url 'metro:simulation_view' simulation.id %}"><i class="far fa-eye"></i> View</a>
 				{% if user.is_authenticated %}
 				<button type="button" class="btn btn-outline-primary btn-block" data-toggle="modal" data-target="#copyModal" onclick="updateCopyInput('{{ simulation.name }}', {{ simulation.id }});"><i class="far fa-clone"></i> Copy</button>
-				<a role="button" class="btn btn-outline-primary btn-block" href="{% url 'simulation_export' simulation.id %}"><i class="fas fa-download"></i>Export</a>
+				<a role="button" class="btn btn-outline-primary btn-block" href="{% url 'metro:simulation_export' simulation.id %}"><i class="fas fa-download"></i>Export</a>
 				{% endif %}
 			</td>
 		</tr>
@@ -249,10 +247,10 @@ Metropolis
 			<td class="align-middle">{{ simulation.user }}</td>
 			{% endif %}
 			<td>
-				<a role="button" class="btn btn-outline-primary btn-block" href="{% url 'simulation_view' simulation.id %}"><i class="far fa-eye"></i> View</a>
+				<a role="button" class="btn btn-outline-primary btn-block" href="{% url 'metro:simulation_view' simulation.id %}"><i class="far fa-eye"></i> View</a>
 				{% if user.is_authenticated %}
 				<button type="button" class="btn btn-outline-primary btn-block" data-toggle="modal" data-target="#copyModal" onclick="updateCopyInput('{{ simulation.name }}', {{ simulation.id }});"><i class="far fa-clone"></i> Copy</button>
-				<a role="button" class="btn btn-outline-primary btn-block" href="{% url 'simulation_export' simulation.id %}"><i class="fas fa-download"></i>Export</a>
+				<a role="button" class="btn btn-outline-primary btn-block" href="{% url 'metro:simulation_export' simulation.id %}"><i class="fas fa-download"></i>Export</a>
 				{% endif %}
 			</td>
 		</tr>
@@ -280,7 +278,7 @@ Metropolis
 			<td class="align-middle">{{ simulation.comment }}</td>
 			<td class="align-middle">{{ simulation.user }}</td>
 			<td>
-				<a role="button" class="btn btn-outline-primary btn-block" href="{% url 'simulation_view' simulation.id %}"><i class="far fa-eye"></i> View</a>
+				<a role="button" class="btn btn-outline-primary btn-block" href="{% url 'metro:simulation_view' simulation.id %}"><i class="far fa-eye"></i> View</a>
 				{% if user.is_authenticated %}
 				<button type="button" class="btn btn-outline-primary btn-block" data-toggle="modal" data-target="#copyModal" onclick="updateCopyInput('{{ simulation.name }}', {{ simulation.id }});"><i class="far fa-clone"></i> Copy</button>
 				{% endif %}
@@ -303,7 +301,7 @@ Metropolis
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="{% url 'copy_simulation' %}" method="post">
+			<form action="{% url 'metro:copy_simulation' %}" method="post">
 				<div class="modal-body">
 					{% csrf_token %}
 					<input type="hidden" name="copy_id" id="copyId" value="">
@@ -345,13 +343,11 @@ Metropolis
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary mx-auto" data-dismiss="modal">Close</button>
-				<a role="button" class="btn btn-danger mx-auto" href="{% url 'simulation_delete' simulation.id %}">Delete</a>
+				<a role="button" class="btn btn-danger mx-auto" href="{% url 'metro:simulation_delete' simulation.id %}">Delete</a>
 			</div>
 		</div>
 	</div>
 </div>
-
-
 {% endfor %}
 {% endif %}
 
