@@ -18,9 +18,10 @@ import json
 import codecs
 from math import sqrt
 import numpy as np
+import re
 
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect, FileResponse
+from django.http import HttpResponse, HttpResponseRedirect, FileResponse, HttpResponseServerError
 from django.http import Http404
 from django.template.context_processors import request
 from django.urls import reverse, reverse_lazy
@@ -36,6 +37,7 @@ from django.dispatch import receiver
 from django.db.models.signals import pre_delete
 from django.utils import timezone
 from django.db import connection
+from django.core.exceptions import ObjectDoesNotExist
 
 from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
@@ -1410,7 +1412,7 @@ def matrix_export_save(simulation, demandsegment, dir):
     matrix_couples = Matrix.objects.filter(matrices=matrix)
     # To avoid conflict if two users export a file at the same time, we
     # generate a random name for the export file.
-    filename = dir + '/matrix(' + demandsegment.usertype.name + ').tsv'
+    filename = '{0}/matrix_{1}.tsv'.format(dir, demandsegment.id)
 
     with codecs.open(filename, 'w', encoding='utf8') as f:
         writer = csv.writer(f, delimiter='\t')
@@ -2803,7 +2805,7 @@ def usertype_import(request, simulation):
         return render(request, 'metro_app/import_error.html', context)
     else:
         return HttpResponseRedirect(reverse(
-            'demand_view', args=(simulation.id,)
+            'metro:demand_view', args=(simulation.id,)
         ))
 
 
@@ -2822,15 +2824,12 @@ def traveler_zipimport(request, simulation):
             'simulation': simulation,
             'object': 'pricing',
         }
-        return render(request, 'metro_app/import_error.html', context)
+        #return HttpResponseServerError("Bad Request")
+        return render(request, "metro_app/importzip_error.html", context)
     else:
         return HttpResponseRedirect(reverse(
-            'demand_view', args=(simulation.id,)
+            'metro:demand_view', args=(simulation.id,)
         ))
-
-
-
-
 
 def usertype_export(request, simulation, demandsegment):
     usertype = demandsegment.usertype
@@ -3250,7 +3249,8 @@ def simulation_import_action(request):
         # Save the simulation and return its view.
         simulation.scenario = scenario
         simulation.save()
-
+        #demandsegment = DemandSegment()
+        #demandsegment = demandsegment.matrix
         encoded_file = form.cleaned_data['zipfile']
         #pdb.set_trace()
         file = zipfile.ZipFile(encoded_file)
@@ -3258,28 +3258,44 @@ def simulation_import_action(request):
         for n in name:
             if n.endswith("zones.tsv") or n.endswith("zones.csv"):
                 object_import_function(file.open(n), simulation, 'centroid')
+                break
 
         for c in name:
             if c.endswith("intersections.tsv") or c.endswith("intersections.csv"):
                 object_import_function(file.open(c), simulation, 'crossing')
+                break
 
         for l in name:
             if l.endswith("links.tsv") or l.endswith("links.csv"):
                 object_import_function(file.open(l), simulation, 'link')
+                break
 
         for f in name:
             if f.endswith("congestion functions.tsv") or f.endswith("congestion functions.csv"):
                 object_import_function(file.open(f), simulation, 'function')
+                break
+
         for public in name:
             if public.endswith("public_transit.tsv") or public.endswith("public_transit.csv"):
                 public_transit_import_function(file.open(public), simulation)
-        for price in name:
-                if price.endswith("pricings.tsv") or  price.endswith("pricings.csv"):
-                    pricing_import_function(file.open(price), simulation)
+                break
 
-        for matrix in name:
-                if matrix.endswith("usertype_1.tsv") or matrix.endswith("usertype_1.csv"):
-                    usertype_import_function(file.open(matrix), simulation)
+        for price in name:
+            if price.endswith("pricings.tsv") or  price.endswith("pricings.csv"):
+                pricing_import_function(file.open(price), simulation)
+                break
+
+        for user in name:
+            d = re.search('usertype_([0-9])+.tsv$', user)
+            if (d):
+                usertype_import_function(file.open(user), simulation)
+                for m in name:
+                    if m.endswith('matrix_{}.tsv'.format(d.group(1))):
+                        demandsegment = get_query('demandsegment', simulation).last()
+                        matrix_import_function(file.open(m), simulation, demandsegment)
+
+
+
 
         return HttpResponseRedirect(
             reverse('metro:simulation_view', args=(simulation.id,))
@@ -3372,56 +3388,3 @@ def traveler_import_action(request):
     else:
         # I do not see how errors could happen.
         return HttpResponseRedirect(reverse('demand_view'))
-
-
-
-
-
-
-@public_required
-def simulation_import_save(request, simulation):
-    """View to make a zip file of all simulation parameters."""
-
-    files_names = []
-
-    files_names.append(object_export_save(simulation, 'centroid', dir))
-    files_names.append(object_export_save(simulation, 'crossing', dir))
-    files_names.append(object_export_save(simulation, 'link', dir))
-    files_names.append(object_export_save(simulation, 'function', dir))
-    files_names.append(public_transit_export_save(simulation, dir))
-    files_names.append(pricing_export_save(simulation, dir))
-
-
-    demandsegments = get_query('demandsegment', simulation)
-    for demandsegment in demandsegments:
-        files_names.append(matrix_export_save(simulation, demandsegment, dir))
-        files_names.append(travel_usertype_save(simulation, demandsegment, dir))
-
-
-    # Need to add parameters file here
-
-    zipname = '{0}'.format(str(simulation))
-
-    s = BytesIO()
-
-    file = ImportForm(s, 'w')
-
-    for f in files_names:
-        # Calculate path for file in zip
-        fdir, fname = os.path.split(f)
-        zip_path = os.path.join(zipname, fname)
-
-        # Add file, at correct path
-        file.write(f, zip_path)
-
-    file.close()
-
-    # Grab ZIP file from in-memory, make response with correct MIME-type
-    response = HttpResponse(s.getvalue())
-    response['content_type'] = 'application/x-zip-compressed'
-    # ..and correct content-disposition
-    response['Content-Disposition'] = 'attachment; filename={0}.zip'.format(str(simulation))
-
-    shutil.rmtree(dir, ignore_errors=True)
-
-    return response
