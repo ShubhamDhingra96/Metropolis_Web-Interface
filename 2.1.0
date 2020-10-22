@@ -1,0 +1,18 @@
+Collecting djangorestframework-csv
+  Downloading djangorestframework-csv-2.1.0.tar.gz (9.8 kB)
+Requirement already satisfied: djangorestframework in c:\users\nehad\pycharmprojects\metro\v\lib\site-packages (from djangorestframework-csv) (3.11.2)
+Requirement already satisfied: six in c:\users\nehad\pycharmprojects\metro\v\lib\site-packages (from djangorestframework-csv) (1.15.0)
+Collecting unicodecsv
+  Downloading unicodecsv-0.14.1.tar.gz (10 kB)
+Requirement already satisfied: django>=1.11 in c:\users\nehad\pycharmprojects\metro\v\lib\site-packages (from djangorestframework->djangorestframework-csv) (3.1.2)
+Requirement already satisfied: sqlparse>=0.2.2 in c:\users\nehad\pycharmprojects\metro\v\lib\site-packages (from django>=1.11->djangorestframework->djangorestframework-csv) (0.4.1)
+Requirement already satisfied: asgiref~=3.2.10 in c:\users\nehad\pycharmprojects\metro\v\lib\site-packages (from django>=1.11->djangorestframework->djangorestframework-csv) (3.2.10)
+Requirement already satisfied: pytz in c:\users\nehad\pycharmprojects\metro\v\lib\site-packages (from django>=1.11->djangorestframework->djangorestframework-csv) (2020.1)
+Using legacy 'setup.py install' for djangorestframework-csv, since package 'wheel' is not installed.
+Using legacy 'setup.py install' for unicodecsv, since package 'wheel' is not installed.
+Installing collected packages: unicodecsv, djangorestframework-csv
+    Running setup.py install for unicodecsv: started
+    Running setup.py install for unicodecsv: finished with status 'done'
+    Running setup.py install for djangorestframework-csv: started
+    Running setup.py install for djangorestframework-csv: finished with status 'done'
+Successfully installed djangorestframework-csv-2.1.0 unicodecsv-0.14.1

@@ -88,14 +88,14 @@ The simulation has no traveler type.
     <br>
 
      <!-- Code Added by Shubham on 15-09-2020 to add the Export function on Traveler's Page -->
- <a role="button" class="btn btn-primary my-3" href="{% url 'metro:traveler_simulation_export' simulation.id %}" data-target="#exportUsertypeModal" title="Export a new traveler type">
+ <a role="button" class="btn btn-primary my-3" href="{% url 'metro:traveler_import_action' simulation.id %}" data-target="#exportUsertypeModal" title="Export a new traveler type">
      <i class="fas fa-download"></i> Export traveler types</a>
 </a>
 
 <br>
 
     <button type="button" class="btn btn-primary my-3" data-toggle="modal" data-target="#newImportSimulation" title="Import a new traveler type">
-	<i class="fas fa-plus-circle"></i> Import a traveler type (.zip file)
+	<i class="fas fa-plus-circle"></i> Import traveler types (.zip file)
 </button>
 
 <br>
@@ -184,7 +184,7 @@ The simulation has no traveler type.
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="{% url 'metro:traveler_zipimport' simulation.id %}" method="post" enctype="multipart/form-data">
+			<form action="{% url 'metro:traveler_import_action' simulation.id %}" method="post" enctype="multipart/form-data">
 				{% csrf_token %}
 				<div class="modal-body form-group">
 					{% render_field import_form.import_file class="form-control-file my-3" %}

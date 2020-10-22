@@ -173,6 +173,6 @@ urlpatterns = [
     path(r'<simulation_id>/object/<object_name>/export/',
         views.object_export, name='object_export'),
     path(r'<simulation_id>/demand/import/', views.usertype_import, name='usertype_import'),
-    path(r'<simulation_id>/demand/importzip/', views.traveler_zipimport, name='traveler_zipimport'),
+    path(r'<simulation_id>/demand/importzip/', views.traveler_import_action, name='traveler_import_action'),
 
 ]

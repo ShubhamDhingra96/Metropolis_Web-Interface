@@ -20,6 +20,7 @@ from math import sqrt
 import numpy as np
 import re
 
+from django.forms import ModelForm
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, FileResponse, HttpResponseServerError
 from django.http import Http404
@@ -242,7 +243,10 @@ def simulation_manager(request):
         simulation_private_list = \
             Simulation.objects.filter(public=False).exclude(user=request.user)
     # Create a form for new simulations.
+
+    import_form = SimulationImportForm(request.user)
     simulation_form = BaseSimulationForm(request.user)
+
     # Create a form for copied simulations (the form has the same fields as the
     # form for new simulations, we add the prefix copy to differentiate the
     # two).
@@ -254,9 +258,14 @@ def simulation_manager(request):
         'simulation_pinned_list': simulation_pinned_list,
         'simulation_private_list': simulation_private_list,
         'simulation_form': simulation_form,
+        'import_form': import_form,
         'copy_form': copy_form,
     }
     return render(request, 'metro_app/simulation_manager.html', context)
+
+
+
+
 
 def register(request):
     """View to show the register form."""
@@ -469,6 +478,8 @@ def simulation_add_action(request):
     else:
         # I do not see how errors could happen.
         return HttpResponseRedirect(reverse('metro:simulation_manager'))
+
+
 
 
 @require_POST
@@ -897,6 +908,7 @@ def copy_simulation(request):
     return HttpResponseRedirect(reverse('metro:simulation_manager'))
 
 
+
 @owner_required
 def simulation_delete(request, simulation):
     """View used to delete a simulation.
@@ -925,6 +937,8 @@ def simulation_view(request, simulation):
     # Create the form to edit the parameters.
     simulation_form = ParametersSimulationForm(owner=owner,
                                                instance=simulation)
+
+    import_form = SimulationImportForm(request.user, instance=simulation)
     # Count the number of each elements in the network.
     network = dict()
     network['centroids'] = get_query('centroid', simulation).count()
@@ -990,6 +1004,7 @@ def simulation_view(request, simulation):
         'copy_form': copy_form,
         'edit_form': edit_form,
         'simulation_form': simulation_form,
+        'import_form': import_form,
         'network': network,
         'travelers': travelers,
         'policy': policy,
@@ -1008,8 +1023,14 @@ def simulation_view_save(request, simulation):
     """View to save the changes to the simulation parameters."""
     simulation_form = ParametersSimulationForm(owner=True, data=request.POST,
                                                instance=simulation)
+
+    import_form = ParametersSimulationForm(owner=True, data=request.POST,
+                                               instance=simulation)
     if simulation_form.is_valid():
         simulation_form.save()
+
+        if import_form.is_valid():
+            import_form.save()
         # Variables stac_check and iterations_check are not used by Metropolis
         # so if the variable is not checked, we must put the associated
         # variable to 0.
@@ -1028,6 +1049,7 @@ def simulation_view_save(request, simulation):
         context = {
             'simulation': simulation,
             'form': simulation_form,
+            'import_form': import_form,
         }
         return render(request, 'metro_app/errors.html', context)
 
@@ -1442,7 +1464,7 @@ def matrix_import(request, simulation, demandsegment):
         return render(request, 'metro_app/import_error.html', context)
     else:
         return HttpResponseRedirect(reverse(
-            'matrix_view', args=(simulation.id, demandsegment.id,)
+            'metro:matrix_view', args=(simulation.id, demandsegment.id,)
         ))
 
 
@@ -2704,7 +2726,7 @@ def simulation_export(request, simulation):
     demandsegments = get_query('demandsegment', simulation)
     for demandsegment in demandsegments:
         files_names.append(matrix_export_save(simulation, demandsegment, dir))
-
+        files_names.append(travel_usertype_save(simulation, demandsegment, dir))
 
     # Need to add parameters file here
 
@@ -2814,7 +2836,7 @@ def usertype_import(request, simulation):
 def traveler_zipimport(request, simulation):
     """View to convert the imported file to usertype in the database."""
     try:
-        encoded_file = request.cleaned_data['zipfile']
+        encoded_file = request.FILES['zipfile']
         import_function_zip(encoded_file, simulation)
     except Exception as e:
         # Catch any exception while importing the file and return an error page
@@ -2831,9 +2853,10 @@ def traveler_zipimport(request, simulation):
             'metro:demand_view', args=(simulation.id,)
         ))
 
-def usertype_export(request, simulation, demandsegment):
+@public_required
+@check_demand_relation
+def usertype_export(request,simulation,demandsegment):
     usertype = demandsegment.usertype
-
     """View to send a file with the OD Matrix to the user."""
     # To avoid conflict if two users export a file at the same time, we
     # generate a random name for the export file.
@@ -2858,8 +2881,6 @@ def usertype_export(request, simulation, demandsegment):
                                                                      'typeOfDepartureMu', 'typeOfRouteMu',
                                                                      'typeOfModeMu', 'localATIS', 'modeChoice',
                                                                      'modeShortRun', 'commuteType')
-
-        # Write a custom header.
         writer.writerow(
             ['name', 'comment', 'alphaTI_mean', 'alphaTI_std', 'alphaTI_type', 'alphaTP_mean', 'alphaTP_std',
              'alphaTP_type', 'beta_mean', 'beta_std', 'beta_type', 'delta_mean', 'delta_std', 'delta_type',
@@ -2868,6 +2889,7 @@ def usertype_export(request, simulation, demandsegment):
              'routeMu_mean', 'routeMu_std', 'routeMu_type', 'tstar_mean', 'tstar_std', 'tstar_type',
              'typeOfRouteChoice', 'typeOfDepartureMu', 'typeOfRouteMu', 'typeOfModeMu', 'localATIS', 'modeChoice',
              'modeShortRun', 'commuteType'])
+
         writer.writerows(values)
     with codecs.open(filename, 'r', encoding='utf8') as f:
         # Build a response to send a file.'beta_mean',
@@ -3183,7 +3205,7 @@ def simulation_import_action(request):
     """
     # Create a form with the data send and check if it is valid.
 
-    form = BaseSimulationForm(request.user, request.POST, request.FILES)
+    form = SimulationImportForm(request.user, request.POST, request.FILES)
     if form.is_valid():
         # Create a new simulation with the attributes sent.
         simulation = Simulation()
@@ -3249,10 +3271,10 @@ def simulation_import_action(request):
         # Save the simulation and return its view.
         simulation.scenario = scenario
         simulation.save()
-        #demandsegment = DemandSegment()
-        #demandsegment = demandsegment.matrix
+        # demandsegment = DemandSegment()
+        # demandsegment = demandsegment.matrix
         encoded_file = form.cleaned_data['zipfile']
-        #pdb.set_trace()
+        # pdb.set_trace()
         file = zipfile.ZipFile(encoded_file)
         name = file.namelist()
         for n in name:
@@ -3281,7 +3303,7 @@ def simulation_import_action(request):
                 break
 
         for price in name:
-            if price.endswith("pricings.tsv") or  price.endswith("pricings.csv"):
+            if price.endswith("pricings.tsv") or price.endswith("pricings.csv"):
                 pricing_import_function(file.open(price), simulation)
                 break
 
@@ -3293,98 +3315,53 @@ def simulation_import_action(request):
                     if m.endswith('matrix_{}.tsv'.format(d.group(1))):
                         demandsegment = get_query('demandsegment', simulation).last()
                         matrix_import_function(file.open(m), simulation, demandsegment)
-
-
-
-
         return HttpResponseRedirect(
             reverse('metro:simulation_view', args=(simulation.id,))
         )
     else:
-        return HttpResponseRedirect(reverse('simulation_manager'))
+        return HttpResponseRedirect(
+            reverse('metro:simulation_manager')
+        )
 
 
 @require_POST
 @owner_required
-def traveler_import_action(request):
+def traveler_import_action(request, simulation):
     """This view is used when a user creates a new simulation.
     The request should contain data for the new simulation (name, comment and
     public).
     """
     # Create a form with the data send and check if it is valid.
+    try:
 
-    form = BaseSimulationForm(request.user, request.POST, request.FILES)
-    if form.is_valid():
-        # Create a new simulation with the attributes sent.
-        simulation = Simulation()
-        simulation.user = request.user
-        simulation.name = form.cleaned_data['name']
-        simulation.comment = form.cleaned_data['comment']
-        simulation.public = form.cleaned_data['public']
-        simulation.environment = form.cleaned_data['environment']
-        simulation.contact = form.cleaned_data['contact']
-        # Create models associated with the new simulation.
-        network = Network()
-        network.name = simulation.name
-        network.save()
-        function_set = FunctionSet()
-        function_set.name = simulation.name
-        function_set.save()
-        # Add defaults functions.
-        function = Function(name='Free flow', user_id=1,
-                            expression='3600*(length/speed)')
-        function.save()
-        function.vdf_id = function.id
-        function.save()
-        function.functionset.add(function_set)
-        function = Function(name='Bottleneck function', user_id=2,
-                            expression=('3600*((dynVol<=(lanes*capacity*length'
-                                        + '/speed))*(length/speed)+(dynVol>'
-                                        + '(lanes*capacity*length/speed))*'
-                                        + '(dynVol/(capacity*lanes)))'))
-        function.save()
-        function.vdf_id = function.id
-        function.save()
-        function.functionset.add(function_set)
-        # Log density is not working somehow.
-        # function = Function(name='Log density', user_id=3,
-        # expression=('3600*(length/speed)'
-        # '*((dynVol<=8.0*lanes*length)'
-        # '+(dynVol>8.0*lanes*length)'
-        # '*((dynVol<0.9*130.0*lanes*length)'
-        # '*ln(130.0/8.0)'
-        # '/ln(130.0*lanes*length/(dynVol+0.01))'
-        # '+(dynVol>=0.9*130.0*lanes*length)'
-        # '*ln(130.0/8.0)/ln(1/0.9)))'))
-        # function.save()
-        # function.vdf_id = function.id
-        # function.save()
-        # function.functionset.add(function_set)
-        pttimes = Matrices()
-        pttimes.save()
-        supply = Supply()
-        supply.name = simulation.name
-        supply.network = network
-        supply.functionset = function_set
-        supply.pttimes = pttimes
-        supply.save()
-        demand = Demand()
-        demand.name = simulation.name
-        demand.save()
-        scenario = Scenario()
-        scenario.name = simulation.name
-        scenario.supply = supply
-        scenario.demand = demand
-        scenario.save()
-        # Save the simulation and return its view.
-        simulation.scenario = scenario
-        simulation.save()
-        # Create a new simulation with the attributes sent.
-        # Create mosimulation_import_actiondels associated with the new simulation.
+        form = ImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            encoded_file = form.cleaned_data['import_file']
+            # pdb.set_trace()
+
+            file = zipfile.ZipFile(encoded_file)
+            name = file.namelist()
+            for user in name:
+                d = re.search('usertype_([0-9])+.tsv$', user)
+                if (d):
+                    usertype_import_function(file.open(user), simulation)
+                    for m in name:
+                        if m.endswith('matrix_{}.tsv'.format(d.group(1))):
+                            demandsegment = get_query('demandsegment', simulation).last()
+                            matrix_import_function(file.open(m), simulation, demandsegment)
+    except Exception as e:
+        # Catch any exception while importing the file and return an error page
+        # if there is any.
+        print(e)
+        context = {
+            'simulation': simulation,
+            'object': 'pricing',
+        }
+        #return HttpResponseServerError("Bad Request")
+        return render(request, "metro_app/importzip_error.html", context)
+
+    else:
 
         return HttpResponseRedirect(reverse(
-            'demand_view', args=(simulation.id,)
+            'metro:demand_view', args=(simulation.id,)
         ))
-    else:
-        # I do not see how errors could happen.
-        return HttpResponseRedirect(reverse('demand_view'))
