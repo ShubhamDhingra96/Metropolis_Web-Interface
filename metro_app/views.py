@@ -3152,7 +3152,7 @@ def gen_formset(object_name, simulation, request=None):
                 )
     return formset
 
-
+# View to add a usertype in a zip file on Traveler's page 
 def travel_usertype_save(simulation, demandsegment, dir):
     """View to send a file with the OD Matrix to the user."""
     usertype = demandsegment.usertype
@@ -3195,7 +3195,7 @@ def travel_usertype_save(simulation, demandsegment, dir):
         writer.writerows(values)
     return filename
 
-
+# Created a View for the Import Simulation on the Homepage which will import the Simulation
 @require_POST
 @login_required
 def simulation_import_action(request):
@@ -3323,7 +3323,7 @@ def simulation_import_action(request):
             reverse('metro:simulation_manager')
         )
 
-
+# Created a view which will import the traveler types in the zip file.
 @require_POST
 @owner_required
 def traveler_import_action(request, simulation):
