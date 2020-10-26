@@ -2392,7 +2392,7 @@ def network_view_run(request, simulation, run):
         return render(request, 'metro_app/network.html', context)
     else:
         # The network file for the run does not exist.
-        return HttpResponseRedirect(reverse('simulation_manager'))
+        return HttpResponseRedirect(reverse('metro:simulation_manager'))
 
 
 # ====================
