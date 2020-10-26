@@ -3325,9 +3325,7 @@ def traveler_import_action(request, simulation):
 
         form = ImportForm(request.POST, request.FILES)
         if form.is_valid():
-            encoded_file = form.cleaned_data['import_file']
-            # pdb.set_trace()
-
+            encoded_file = form.cleaned_data['import_file']            
             file = zipfile.ZipFile(encoded_file)
             name = file.namelist()
             for user in name:
