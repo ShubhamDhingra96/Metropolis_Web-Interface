@@ -2767,14 +2767,6 @@ def traveler_simulation_export(request, simulation):
 
     files_names = []
 
-    #files_names.append(object_export_save(simulation, 'centroid', dir))
-    #files_names.append(object_export_save(simulation, 'crossing', dir))
-    #files_names.append(object_export_save(simulation, 'link', dir))
-    #files_names.append(object_export_save(simulation, 'function', dir))
-    #files_names.append(public_transit_export_save(simulation, dir))
-    #files_names.append(pricing_export_save(simulation, dir))
-
-
     demandsegments = get_query('demandsegment', simulation)
     for demandsegment in demandsegments:
         files_names.append(matrix_export_save(simulation, demandsegment, dir))
@@ -3271,10 +3263,7 @@ def simulation_import_action(request):
         # Save the simulation and return its view.
         simulation.scenario = scenario
         simulation.save()
-        # demandsegment = DemandSegment()
-        # demandsegment = demandsegment.matrix
-        encoded_file = form.cleaned_data['zipfile']
-        # pdb.set_trace()
+        encoded_file = form.cleaned_data['zipfile']        
         file = zipfile.ZipFile(encoded_file)
         name = file.namelist()
         for n in name:
