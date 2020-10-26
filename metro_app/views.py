@@ -1647,7 +1647,7 @@ def pricing_import(request, simulation):
         return render(request, 'metro_app/import_error.html', context)
     else:
         return HttpResponseRedirect(reverse(
-            'pricing_main', args=(simulation.id,)
+            'metro:pricing_main', args=(simulation.id,)
         ))
 
 
@@ -1838,7 +1838,7 @@ def public_transit_import(request, simulation):
         return render(request, 'metro_app/import_error.html', context)
     else:
         return HttpResponseRedirect(reverse(
-            'public_transit_view', args=(simulation.id,)
+            'metro:public_transit_view', args=(simulation.id,)
         ))
 
 
@@ -2004,7 +2004,7 @@ def object_import(request, simulation, object_name):
         return render(request, 'metro_app/import_error.html', context)
     else:
         return HttpResponseRedirect(
-            reverse('object_list', args=(simulation.id, object_name,))
+            reverse('metro:object_list', args=(simulation.id, object_name,))
         )
 
 
@@ -3356,8 +3356,7 @@ def traveler_import_action(request, simulation):
         context = {
             'simulation': simulation,
             'object': 'pricing',
-        }
-        #return HttpResponseServerError("Bad Request")
+        }        
         return render(request, "metro_app/importzip_error.html", context)
 
     else:
