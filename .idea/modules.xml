@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/metropolis_web_interface.iml" filepath="$PROJECT_DIR$/.idea/metropolis_web_interface.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/MetropolisWebInterfacebatch.iml" filepath="$PROJECT_DIR$/.idea/MetropolisWebInterfacebatch.iml" />
     </modules>
   </component>
 </project>

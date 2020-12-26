@@ -1,11 +1,11 @@
 from django import forms
 from django.forms import BaseModelFormSet
-from django.forms import formset_factory, modelformset_factory
+from django.forms import modelformset_factory
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
-from .models import *
-from .functions import *
+from metro_app import models
+from metro_app import functions
 
 
 # ====================
@@ -62,7 +62,7 @@ class CustomCheckboxInput(forms.CheckboxInput):
 
     def __init__(self, attrs=None):
         super().__init__(attrs)
-        self.check_test = custom_check_test
+        self.check_test = functions.custom_check_test
 
     def value_from_datadict(self, data, files, name):
         if name not in data:
@@ -79,17 +79,14 @@ class BaseSimulationForm(forms.ModelForm):
     The form is used to create new a simulation, to copy a simulation or to
     edit the variable of an existing simulation.
     """
-
     # environment = forms.ModelChoiceField(queryset=Environment.objects.none())
-    #zipfile = forms.FileField()
-    #zipfile = forms.FileField()
 
     def __init__(self, user, *args, **kwargs):
         super(BaseSimulationForm, self).__init__(*args, **kwargs)
         if user.is_authenticated:
-            auth_environments = Environment.objects.filter(users=user)
+            auth_environments = models.Environment.objects.filter(users=user)
         else:
-            auth_environments = Environment.objects.none()
+            auth_environments = models.Environment.objects.none()
         self.fields['environment'] = forms.ModelChoiceField(
             queryset=auth_environments, required=False)
         # Field comment is not required.
@@ -99,12 +96,9 @@ class BaseSimulationForm(forms.ModelForm):
         for bound_field in self:
             bound_field.field.widget.attrs['title'] = bound_field.help_text
 
-        # if self.fields.widget.att
-
     class Meta:
-        model = Simulation
+        model = models.Simulation
         fields = ['name', 'comment', 'environment', 'contact', 'public']
-
 
 
 class SimulationImportForm(forms.ModelForm):
@@ -113,16 +107,15 @@ class SimulationImportForm(forms.ModelForm):
     The form is used to create new a simulation, to copy a simulation or to
     edit the variable of an existing simulation.
     """
-
     # environment = forms.ModelChoiceField(queryset=Environment.objects.none())
+    zipfile = forms.FileField(label='ZIP file')
 
-    zipfile = forms.FileField()
     def __init__(self, user, *args, **kwargs):
         super(SimulationImportForm, self).__init__(*args, **kwargs)
         if user.is_authenticated:
-            auth_environments = Environment.objects.filter(users=user)
+            auth_environments = models.Environment.objects.filter(users=user)
         else:
-            auth_environments = Environment.objects.none()
+            auth_environments = models.Environment.objects.none()
         self.fields['environment'] = forms.ModelChoiceField(
             queryset=auth_environments, required=False)
         # Field comment is not required.
@@ -132,10 +125,8 @@ class SimulationImportForm(forms.ModelForm):
         for bound_field in self:
             bound_field.field.widget.attrs['title'] = bound_field.help_text
 
-        # if self.fields.widget.att
-
     class Meta:
-        model = Simulation
+        model = models.Simulation
         fields = ['name', 'comment', 'environment', 'contact', 'public']
 
 
@@ -176,7 +167,7 @@ class ParametersSimulationForm(forms.ModelForm):
             bound_field.field.widget.attrs['title'] = bound_field.help_text
 
     class Meta:
-        model = Simulation
+        model = models.Simulation
         fields = [
             'stacLim', 'iterations', 'startTime', 'lastRecord',
             'recordsInterval', 'jamDensity', 'advancedLearningProcess',
@@ -201,7 +192,7 @@ class RunForm(forms.ModelForm):
         return instance
 
     class Meta:
-        model = SimulationRun
+        model = models.SimulationRun
         fields = ['name']
 
 
@@ -259,8 +250,8 @@ class UserTypeForm(forms.ModelForm):
         for bound_field in self:
             bound_field.field.widget.attrs['title'] = bound_field.help_text
         self.fields['scale'].widget.attrs['title'] = (
-                'All values in the O-D matrix of the traveler type are multiplied '
-                + 'by the scale value'
+            'All values in the O-D matrix of the traveler type are multiplied '
+            + 'by the scale value'
         )
         # Add initial scale value.
         self.fields['scale'].initial = \
@@ -360,7 +351,7 @@ class UserTypeForm(forms.ModelForm):
         return instance
 
     class Meta:
-        model = UserType
+        model = models.UserType
         fields = ['name', 'comment', 'typeOfModeMu', 'typeOfDepartureMu',
                   'typeOfRouteMu', 'typeOfRouteChoice', 'localATIS',
                   'modeChoice', 'modeShortRun', 'commuteType']
@@ -376,7 +367,7 @@ class MatrixForm(forms.ModelForm):
     """Form to edit an OD pair."""
 
     class Meta:
-        model = Matrix
+        model = models.Matrix
         fields = ['r']
 
 
@@ -384,8 +375,9 @@ class PolicyForm(forms.ModelForm):
     """Form to edit pricing policy."""
 
     class Meta:
-        model = Policy
-        fields = ['usertype', 'location', 'baseValue', 'timeVector', 'valueVector']
+        model = models.Policy
+        fields = ['usertype', 'location', 'baseValue', 'timeVector',
+                  'valueVector']
 
 
 class CentroidForm(forms.ModelForm):
@@ -411,14 +403,14 @@ class CentroidForm(forms.ModelForm):
     def save(self, commit=True):
         # If no name is specify, set name to be empty string.
         instance = super(CentroidForm, self).save(commit=False)
-        if instance.name == None:
+        if instance.name is None:
             instance.name = ''
         if commit:
             instance.save()
         return instance
 
     class Meta:
-        model = Centroid
+        model = models.Centroid
         fields = ['name', 'x', 'y', 'user_id']
 
 
@@ -444,14 +436,14 @@ class CrossingForm(forms.ModelForm):
     def save(self, commit=True):
         # If no name is specify, set name to be empty string.
         instance = super(CrossingForm, self).save(commit=False)
-        if instance.name == None:
+        if instance.name is None:
             instance.name = ''
         if commit:
             instance.save()
         return instance
 
     class Meta:
-        model = Crossing
+        model = models.Crossing
         fields = ['name', 'x', 'y', 'user_id']
 
 
@@ -465,11 +457,11 @@ class LinkForm(forms.ModelForm):
         # Field name is not required.
         self.fields['name'].required = False
         # The choices for origin and destination are the nodes of the Network.
-        node_choices = get_node_choices(simulation)
+        node_choices = functions.get_node_choices(simulation)
         self.fields['origin'].choices = node_choices
         self.fields['destination'].choices = node_choices
         # The choices for vdf are the functions of the associated function set.
-        self.fields['vdf'].queryset = Function.objects.filter(
+        self.fields['vdf'].queryset = models.Function.objects.filter(
             functionset__supply__scenario__simulation=simulation
         )
         # Add tooltips.
@@ -487,14 +479,14 @@ class LinkForm(forms.ModelForm):
     def save(self, commit=True):
         # If no name is specify, set name to be empty string.
         instance = super(LinkForm, self).save(commit=False)
-        if instance.name == None:
+        if instance.name is None:
             instance.name = ''
         if commit:
             instance.save()
         return instance
 
     class Meta:
-        model = Link
+        model = models.Link
         fields = [
             'name', 'origin', 'destination', 'lanes', 'length', 'speed',
             'vdf', 'capacity', 'user_id'
@@ -521,7 +513,7 @@ class FunctionForm(forms.ModelForm):
         return bool(changed_data or is_new)
 
     class Meta:
-        model = Function
+        model = models.Function
         fields = ['name', 'expression', 'user_id']
         widgets = {
             'expression': forms.TextInput(),
@@ -544,7 +536,7 @@ class CentroidModelFormSet(BaseModelFormSet):
             # Don't bother validating the formset unless each form is valid on
             # its own
             return
-        crossings = get_query('crossing', self.simulation)
+        crossings = functions.get_query('crossing', self.simulation)
         user_ids = list(crossings.values_list('user_id', flat=True))
         for form in self.forms:
             user_id = form.cleaned_data['user_id']
@@ -552,9 +544,9 @@ class CentroidModelFormSet(BaseModelFormSet):
             if not delete:
                 if user_id in user_ids:
                     raise forms.ValidationError(
-                        'Two nodes (zones and intersections) cannot have the same '
-                        'id (id: {}).'.format(user_id)
-                    )
+                        'Two nodes (zones and intersections) cannot have the '
+                        'same id (id: {}).'
+                    ).format(user_id)
                 user_ids.append(user_id)
 
 
@@ -569,7 +561,7 @@ class CrossingModelFormSet(BaseModelFormSet):
             # Don't bother validating the formset unless each form is valid on
             # its own
             return
-        centroids = get_query('centroid', self.simulation)
+        centroids = functions.get_query('centroid', self.simulation)
         user_ids = list(centroids.values_list('user_id', flat=True))
         for form in self.forms:
             user_id = form.cleaned_data['user_id']
@@ -577,9 +569,9 @@ class CrossingModelFormSet(BaseModelFormSet):
             if not delete:
                 if user_id in user_ids:
                     raise forms.ValidationError(
-                        'Two nodes (zones and intersections) cannot have the same '
-                        'id (id: {}).'.format(user_id)
-                    )
+                        'Two nodes (zones and intersections) cannot have the '
+                        'same id (id: {}).'
+                    ).format(user_id)
                 user_ids.append(user_id)
 
 
@@ -659,8 +651,7 @@ class EnvironmentUserAddForm(forms.Form):
             return valid
 
         try:
-            user = User.objects.get(username=self.cleaned_data['username'])
-
+            User.objects.get(username=self.cleaned_data['username'])
         except User.DoesNotExist:
             self._errors['no_user'] = 'User does not exist'
             return False
@@ -668,24 +659,46 @@ class EnvironmentUserAddForm(forms.Form):
         return True
 
 
+class BatchRunForm(forms.ModelForm):
+    class Meta:
+        model = models.BatchRun
+        fields = ['name', 'comment', 'centroid_file', 'crossing_file',
+                  'function_file', 'link_file', 'public_transit_file',
+                  'traveler_file', 'pricing_file', 'zip_file']
+
+
+class BatchForm(forms.ModelForm):
+    def save(self, simulation, commit=True):
+        # Save the Batch with the specified Simulation.
+        instance = super(BatchForm, self).save(commit=False)
+        instance.simulation = simulation
+        if commit:
+            instance.save()
+        return instance
+
+    class Meta:
+        model = models.Batch
+        fields = ['name', 'comment', 'nb_runs']
+
+
 # ====================
 # FormSets
 # ====================
 
 MatrixFormSet = modelformset_factory(
-    Matrix,
+    models.Matrix,
     form=MatrixForm,
     extra=0
 )
 
 PolicyFormSet = modelformset_factory(
-    Policy,
+    models.Policy,
     form=PolicyForm,
     extra=0,
 )
 
 CentroidFormSet = modelformset_factory(
-    Centroid,
+    models.Centroid,
     form=CentroidForm,
     formset=CentroidModelFormSet,
     can_delete=True,
@@ -693,7 +706,7 @@ CentroidFormSet = modelformset_factory(
 )
 
 CentroidFormSetExtra = modelformset_factory(
-    Centroid,
+    models.Centroid,
     form=CentroidForm,
     formset=CentroidModelFormSet,
     can_delete=True,
@@ -701,7 +714,7 @@ CentroidFormSetExtra = modelformset_factory(
 )
 
 CrossingFormSet = modelformset_factory(
-    Crossing,
+    models.Crossing,
     form=CrossingForm,
     formset=CrossingModelFormSet,
     can_delete=True,
@@ -709,7 +722,7 @@ CrossingFormSet = modelformset_factory(
 )
 
 CrossingFormSetExtra = modelformset_factory(
-    Crossing,
+    models.Crossing,
     form=CrossingForm,
     formset=CrossingModelFormSet,
     can_delete=True,
@@ -717,7 +730,7 @@ CrossingFormSetExtra = modelformset_factory(
 )
 
 LinkFormSet = modelformset_factory(
-    Link,
+    models.Link,
     form=LinkForm,
     formset=LinkModelFormSet,
     can_delete=True,
@@ -725,7 +738,7 @@ LinkFormSet = modelformset_factory(
 )
 
 LinkFormSetExtra = modelformset_factory(
-    Link,
+    models.Link,
     form=LinkForm,
     formset=LinkModelFormSet,
     can_delete=True,
@@ -733,7 +746,7 @@ LinkFormSetExtra = modelformset_factory(
 )
 
 FunctionFormSet = modelformset_factory(
-    Function,
+    models.Function,
     form=FunctionForm,
     formset=FunctionModelFormSet,
     can_delete=True,
@@ -741,7 +754,7 @@ FunctionFormSet = modelformset_factory(
 )
 
 FunctionFormSetExtra = modelformset_factory(
-    Function,
+    models.Function,
     form=FunctionForm,
     formset=FunctionModelFormSet,
     can_delete=True,

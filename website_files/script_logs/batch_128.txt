@@ -1,0 +1,7 @@
+Starting script...
+Traceback (most recent call last):
+  File "C:\Users\nehad\PycharmProjects\MetropolisWebInterfacebatch/metro_app/batch_run.py", line 61, in <module>
+    functions.simulation_import(sim, batch_run.zip_file.file)
+  File "C:\Users\nehad\PycharmProjects\MetropolisWebInterfacebatch\metro_app\functions.py", line 356, in simulation_import
+    encoded_file = file.cleaned_data['zipfile']
+AttributeError: 'File' object has no attribute 'cleaned_data'

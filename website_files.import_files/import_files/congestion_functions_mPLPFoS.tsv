@@ -1,0 +1,3 @@
+id	name	expression
+2	Free flow	3600*(length/speed)
+1	Bottleneck function	3600*((dynVol<=(lanes*capacity*length/speed))*(length/speed)+(dynVol>(lanes*capacity*length/speed))*(dynVol/(capacity*lanes)))

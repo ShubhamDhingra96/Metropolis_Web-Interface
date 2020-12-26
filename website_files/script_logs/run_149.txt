@@ -1,0 +1,13 @@
+Starting script...
+Copying the network json file...
+Storing the parameters of the simulation...
+Traceback (most recent call last):
+  File "C:\Users\nehad\PycharmProjects\MetropolisWebInterfacebatch/metro_app/build_results.py", line 37, in <module>
+    from metro_app.views import LINK_THRESHOLD, NETWORK_THRESHOLD
+  File "C:\Users\nehad\PycharmProjects\MetropolisWebInterfacebatch\metro_app\views.py", line 35, in <module>
+    from metro_app import filters, forms, functions, models, plots, tables
+  File "C:\Users\nehad\PycharmProjects\MetropolisWebInterfacebatch\metro_app\forms.py", line 678, in <module>
+    class BatchForm(forms.ModelForm):
+  File "C:\Users\nehad\PycharmProjects\MetropolisWebInterfacebatch\batchtest\lib\site-packages\django\forms\models.py", line 268, in __new__
+    raise FieldError(message)
+django.core.exceptions.FieldError: Unknown field(s) (comment: Not Started) specified for Batch

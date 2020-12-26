@@ -1,0 +1,1 @@
+origin	destination	travelerType	driveCar	alphaTI	beta	gamma	alphaPT	ptPenalty	td	ta	ltstart	htstar	fee	surplus

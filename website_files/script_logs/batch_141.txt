@@ -1,0 +1,9 @@
+Starting script...
+Traceback (most recent call last):
+  File "C:\Users\nehad\PycharmProjects\MetropolisWebInterfacebatch/metro_app/batch_run.py", line 55, in <module>
+    functions.traveler_zip_file(sim, batch_run.zip_file.file)
+  File "C:\Users\nehad\PycharmProjects\MetropolisWebInterfacebatch\batchtest\lib\site-packages\django\db\models\fields\files.py", line 41, in _get_file
+    self._require_file()
+  File "C:\Users\nehad\PycharmProjects\MetropolisWebInterfacebatch\batchtest\lib\site-packages\django\db\models\fields\files.py", line 38, in _require_file
+    raise ValueError("The '%s' attribute has no file associated with it." % self.field.name)
+ValueError: The 'zip_file' attribute has no file associated with it.

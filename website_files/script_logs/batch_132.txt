@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "C:\Users\nehad\PycharmProjects\MetropolisWebInterfacebatch/metro_app/batch_run.py", line 18, in <module>
+    from metro_app import models, functions, plots
+  File "C:\Users\nehad\PycharmProjects\MetropolisWebInterfacebatch\metro_app\functions.py", line 24, in <module>
+    from metro_app import models, forms
+  File "C:\Users\nehad\PycharmProjects\MetropolisWebInterfacebatch\metro_app\forms.py", line 133, in <module>
+    class ParametersSimulationForm(forms.ModelForm):
+  File "C:\Users\nehad\PycharmProjects\MetropolisWebInterfacebatch\metro_app\forms.py", line 169, in ParametersSimulationForm
+    class Meta:
+  File "C:\Users\nehad\PycharmProjects\MetropolisWebInterfacebatch\metro_app\forms.py", line 179, in Meta
+    'horizontalQueueing': CustomCheckboxInput(),
+  File "C:\Users\nehad\PycharmProjects\MetropolisWebInterfacebatch\metro_app\forms.py", line 65, in __init__
+    self.check_test = functions.custom_check_test
+AttributeError: partially initialized module 'metro_app.functions' has no attribute 'custom_check_test' (most likely due to a circular import)

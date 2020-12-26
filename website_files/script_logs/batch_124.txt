@@ -1,0 +1,7 @@
+Starting script...
+Traceback (most recent call last):
+  File "C:\Users\nehad\PycharmProjects\MetropolisWebInterfacebatch/metro_app/batch_run.py", line 61, in <module>
+    functions.object_import_function(batch_run.zip_file, sim, "zip_file")
+  File "C:\Users\nehad\PycharmProjects\MetropolisWebInterfacebatch\metro_app\functions.py", line 379, in object_import_function
+    tsv_file = StringIO(encoded_file.read().decode())
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xa0 in position 18: invalid start byte

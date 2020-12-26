@@ -1,0 +1,7 @@
+Starting script...
+Traceback (most recent call last):
+  File "C:\Users\nehad\PycharmProjects\MetropolisWebInterfacebatch/metro_app/batch_run.py", line 55, in <module>
+    functions.traveler_zip_file(sim, batch_run.zip_file)
+  File "C:\Users\nehad\PycharmProjects\MetropolisWebInterfacebatch\metro_app\functions.py", line 423, in traveler_zip_file
+    namelist = file.namelist()
+AttributeError: 'FieldFile' object has no attribute 'namelist'
